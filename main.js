@@ -1,31 +1,78 @@
 //Player
-let player_xPos = 500;
-let player_yPos = 500;
-const player_size = 25;
-const player_speed = 5;
+class Player {
+  constructor() {
+    this.playerSize = 25;
+    this.playerSpeed = 5;
+    this.playerPlayerHealth = 100;
+  }
 
-//Kollar om knappen är nedtryckt
-//Lägga till arrow keys
-let keys = {
-  w: false,
-  a: false,
-  s: false,
-  d: false,
-};
+  drawPlayer() {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(playerX * cellSize, playerY * cellSize, cellSize, cellSize);
+  }
+}
 
-//Kollar om man trycker ner knappen
-document.onkeydown = function (e) {
-  console.log(e); //Inparametern e innehåller ett event-objekt med information om eventet.
-  const key = e.key;
+class Bullets {
+  constructor() {
+    this.bulletDamage = 5;
+  }
 
-  //Objektet får värdet true
-  keys[key] = true;
-};
+  drawBullet() {
+    ctx.fillStyle = "red";
 
-//Kollar om knappen är inte tryckt
-document.onkeyup = function (e) {
-  const key = e.key;
+    bullets.forEach((bullet) => {
+      ctx.fillRect(
+        bullet.x * cellSize,
+        bullet.y * cellSize,
+        cellSize,
+        cellSize
+      );
+    });
+  }
+}
 
-  //Objektet fär värde false
-  keys[key] = false;
-};
+//Zombie
+class Zombie {
+  constructor() {
+    this.zombieSize = 15;
+    this.zombieSpeed = 2;
+    this.zombieHealth = 20;
+  }
+
+  drawZombie() {
+    tx.fillStyle = "green";
+    ctx.fillRect(zombie.x * cellSize, zombie.y * cellSize, cellSize, cellSize);
+  }
+}
+
+//Spelet
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+class Game {
+  constructor() {
+    this.gridSize = 10;
+    this.cellSize = 40;
+  }
+
+  drawGame() {
+    //Gör spelplanens storlek
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "lightgray";
+
+    for (let i = 0; i <= gridSize; i++) {
+      ctx.beginPath();
+
+      //Flyttar och ritar sidan av cellen
+      ctx.moveTo(i * cellSize, 0);
+      ctx.lineTo(i * cellSize, canvas.height);
+
+      //Flyttar och ritar toppen och botten av cellen
+      ctx.moveTo(0, i * cellSize);
+      ctx.lineTo(canvas.width, i * cellSize);
+
+      //Gör allt
+      ctx.stroke();
+    }
+  }
+}

@@ -11,8 +11,6 @@ let bullets = [];
 let zombie = { x: 7, y: 7 };
 
 function drawGame() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   // Rita rutnät
   ctx.strokeStyle = "lightgray";
   for (let i = 0; i <= gridSize; i++) {
