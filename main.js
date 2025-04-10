@@ -40,7 +40,7 @@ class Zombie {
   }
 
   drawZombie() {
-    tx.fillStyle = "green";
+    ctx.fillStyle = "green";
     ctx.fillRect(zombie.x * cellSize, zombie.y * cellSize, cellSize, cellSize);
   }
 }
@@ -52,27 +52,177 @@ const ctx = canvas.getContext("2d");
 class Game {
   constructor() {
     this.gridSize = 10;
-    this.cellSize = 40;
+    this.cellSize = 32; // Update to match the tile size in the tilemap
+    this.tilemap = new Image();
+    this.tilemap.src = "assets/Tilemap.png"; // Path to your tilemap image
+    this.tiles = [
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+      [
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+        { tileIndex: 1, type: "water" },
+        { tileIndex: 1, type: "grass" },
+      ],
+
+      // Add more rows as needed
+    ];
   }
 
   drawGame() {
-    //Gör spelplanens storlek
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const tilesPerRow = 16; // Number of tiles per row in the tilemap
+
+    this.tiles.forEach((row, y) => {
+      row.forEach((tile, x) => {
+        const { tileIndex } = tile; // Get the tileIndex from the tile object
+
+        // Calculate the tile's position in the tilemap
+        const tileX = (tileIndex % tilesPerRow) * this.cellSize;
+        const tileY = Math.floor(tileIndex / tilesPerRow) * this.cellSize;
+
+        // Draw the tile on the canvas
+        ctx.drawImage(
+          this.tilemap,
+          tileX,
+          tileY,
+          this.cellSize,
+          this.cellSize,
+          x * this.cellSize,
+          y * this.cellSize,
+          this.cellSize,
+          this.cellSize
+        );
+      });
+    });
+
+    // Draw grid lines
     ctx.strokeStyle = "lightgray";
-
-    for (let i = 0; i <= gridSize; i++) {
+    for (let i = 0; i <= this.gridSize; i++) {
       ctx.beginPath();
-
-      //Flyttar och ritar sidan av cellen
-      ctx.moveTo(i * cellSize, 0);
-      ctx.lineTo(i * cellSize, canvas.height);
-
-      //Flyttar och ritar toppen och botten av cellen
-      ctx.moveTo(0, i * cellSize);
-      ctx.lineTo(canvas.width, i * cellSize);
-
-      //Gör allt
+      ctx.moveTo(i * this.cellSize, 0);
+      ctx.lineTo(i * this.cellSize, canvas.height);
+      ctx.moveTo(0, i * this.cellSize);
+      ctx.lineTo(canvas.width, i * this.cellSize);
       ctx.stroke();
     }
   }
 }
+
+const game = new Game();
+game.tilemap.onload = () => {
+  game.drawGame(); // Ensure the tilemap is loaded before drawing
+};
