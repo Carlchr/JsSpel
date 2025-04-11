@@ -10,14 +10,17 @@ class Player {
 
   drawPlayer() {
     ctx.fillStyle = "blue";
-    ctx.fillRect(playerX * cellSize, playerY * cellSize, cellSize, cellSize);
+    ctx.fillRect(this.playerX * this.cellSize, this.playerY * this.cellSize, this.cellSize, this.cellSize);
   }
 }
 
 class Bullets {
   constructor() {
     this.bulletDamage = 5;
+    this.bullet = []
     this.bulletSize = 10
+    this.bulletX = 0
+    this.bulletY = 0
     this.direction = "right"
   }
 
@@ -26,8 +29,8 @@ class Bullets {
 
     bullets.forEach((bullet) => {
       ctx.fillRect(
-        bullet.x * this.bulletSize,
-        bullet.y * this.bulletSize,
+        this.bulletX * this.bulletSize,
+        this.bulletY * this.bulletSize,
         this.bulletSize,
         this.bulletSize
       );
@@ -41,11 +44,13 @@ class Zombie {
     this.zombieSize = 15;
     this.zombieSpeed = 2;
     this.zombieHealth = 20;
+    this.zombieX = 0
+    this.zombieY = 0
   }
 
   drawZombie() {
     ctx.fillStyle = "green";
-    ctx.fillRect(zombie.x * cellSize, zombie.y * cellSize, cellSize, cellSize);
+    ctx.fillRect(this.zombieX * this.cellSize, this.zombieY * this.cellSize, this.cellSize, this.cellSize);
   }
 }
 
@@ -261,20 +266,20 @@ document.addEventListener("keydown", (e) => {
     playerX++;
   }
   
-  //Flytta gubbe
-  if(e.key === ArrowLeft){
+  //Flytta gubbe"
+  if(e.key === "ArrowLeft"){
     Bullets.direction = "left"
   }
   
-  if(e.key === ArrowUp){
+  if(e.key === "ArrowUp"){
     Bullets.direction = "up"
   }
   
-  if(e.key === ArrowRight){
+  if(e.key === "ArrowRight"){
     Bullets.direction = "right"
   }
   
-  if(e.key === ArrowDown){
+  if(e.key === "ArrowDown"){
     Bullets.direction = "down"
   }
   if (e.key === " ") {
