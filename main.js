@@ -320,12 +320,11 @@ class Game {
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
 
-        const { tileIndex } = tile; // Get the tileIndex from the tile object
+        const { tileIndex } = tile; //tar indexen på tilen och sätter det som variabeln tile
         const tileX = (tileIndex % tilesPerRow) * this.cellSize; //Räknar ut tileposition i x
-        const tileY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize; // R
+        const tileY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize; //Räknar ut tileposition i y
 
-        console.log(tileX, tileY);
-        // Draw the tile on the canvas
+        //Ritar tilemapen
         ctx.drawImage(
           this.tilemap,
           tileX,
@@ -355,19 +354,21 @@ class Game {
   }
 
   //Kordinat på spelaren och vart man kan gå
-  isTileWalkable(x, y, allowedTypes = ["walkable"]) {
-    const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på
-    const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på
+  isTileWalkable(x, y, walkable = ["walkable"]) {
+    const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+    const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
   
-    
+    //Om spelaren är utanför kartan, return false
     if (tileX < 0 || tileY < 0 || tileY >= this.tiles.length || tileX >= this.tiles[0].length) {
       return false;
+    } else{
+      //om tiles listan har tilen man står på och om typen är walkable, return true
+      return walkable.includes(this.tiles[tileY][tileX].type);
     }
-  
-  
-    return allowedTypes.includes(this.tiles[tileY][tileX].type);
-  }
 
+
+    
+  }
 }
 
 //Definerar player och zombies och bullets
@@ -376,7 +377,7 @@ const player = new Player();
 const zombie = new Zombie();
 const game = new Game();
 
-//håller koll vilka som är nedtrckta
+//Håller koll vilka som är nedtrckta
 const keys = {
   w: false,
   a: false,
@@ -389,6 +390,7 @@ const keys = {
   Space: false,
 }
 
+//När knappen trycks ned
 document.addEventListener("keydown", (e) => {
   //Gubbe
 
@@ -417,6 +419,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === " ") keys.Space = true;
 });
 
+//När knappen släpps
 document.addEventListener("keyup", (e) => {
   //Gubbe
   if (e.key === "w") keys.w = false;
@@ -436,35 +439,26 @@ document.addEventListener("keyup", (e) => {
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); //Tömmer canvasen
 
-  //Kollar om knappar är nedtryckta och flyttar spelaren
-
   //Om knappen är nedtryckt och inom gränserna
-  if (keys.w && player.playerY > 0) {
-    player.movePlayer("up");
-  }
-  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {//tar hänsyn till storleken på spelaren med gränserna
-    player.movePlayer("down");
-  }
-  if (keys.a && player.playerX > 0) {
-    player.movePlayer("left");
-  }
-  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {
-    player.movePlayer("right");
-  }
+  if (keys.w && player.playerY > 0) {player.movePlayer("up");}
+  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {player.movePlayer("down");}
+  if (keys.a && player.playerX > 0) {player.movePlayer("left");}
+  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {player.movePlayer("right");}
 
-  //om knappen är nedtryckt och om cooldown är noll
+  //Om knappen är nedtryckt och om cooldown är noll
   if (keys.Space && bulletHandeler.shootCooldown === 0) {
-    bulletHandeler.bullet.push({ //lägger till ett skott i arrayen med  x, y och hastighet
+    //Lägger till ett skott i arrayen med  x, y, riktning och hastighet
+    bulletHandeler.bullet.push({
       x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2, // Starta från spelarens mitt
       y: player.playerY,
       direction: bulletHandeler.direction,
       speed: 5, // Hastighet för skottet
     });
-    //gör cooldown till 20 frames
+    //Gör cooldown till 20 frames
     bulletHandeler.shootCooldown = 20; // Återställ cooldown 
   }
 
-  //minskar cooldown med 1 varje frame
+  //Minskar cooldown med 1 varje frame
   if ( bulletHandeler.shootCooldown > 0) {
     bulletHandeler.shootCooldown--;
   }
@@ -479,8 +473,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // Fortsätter loopen
 }
 
-//Startar game loopen
+//Startar game loopen, och göt det när tilemapen är laddad
 game.tilemap.onload = () => {
   gameLoop();
 };
-
