@@ -1,8 +1,8 @@
 //Player
 class Player {
   constructor() {
-    this.playerSizeX = 25;//Player size
-    this.playerSizeY = 50;//Player size
+    this.playerSizeX = 24;//Player size
+    this.playerSizeY = 48;//Player size
     this.playerSpeed = 1; //Player speed
     this.playerPlayerHealth = 100; //Player health§
     this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
@@ -21,12 +21,23 @@ class Player {
   }
 
   movePlayer(direction) {
-    // Update player position based on direction
-    if (direction === "up") this.playerY -= this.playerSpeed;
-    if (direction === "down") this.playerY += this.playerSpeed;
-    if (direction === "left") this.playerX -= this.playerSpeed;
-    if (direction === "right") this.playerX += this.playerSpeed;
+  //Temporära variabler för att hålla koll på spelaren
+  let nyX = this.playerX;
+  let nyY = this.playerY;
+
+  //Rör spelaren i den riktning som trycks ned
+  if (direction === "up") nyY -= this.playerSpeed;
+  if (direction === "down") nyY += this.playerSpeed;
+  if (direction === "left") nyX -= this.playerSpeed;
+  if (direction === "right") nyX += this.playerSpeed;
+
+    //Kollar om  spelare kan gå på tilen
+    if (game.isTileWalkable(nyX, nyY, ["walkable"])) {
+      this.playerX = nyX;
+      this.playerY = nyY;
+    }
   }
+
 }
 
 //Bullets
@@ -35,21 +46,37 @@ class Bullets {
     this.bulletDamage = 5;
     this.bullet = [];
     this.bulletSize = 10;
-    this.bulletX = 0;
-    this.bulletY = 0;
     this.direction = "right";
+    this.shootCooldown = 0;
   }
 
   drawBullet() {
-    this.bullet.forEach((bullet) => {
-      ctx.fillRect(
-        bullet.x * this.bulletSize,
-        bullet.y * this.bulletSize,
-        this.bulletSize,
-        this.bulletSize
-      );
+    ctx.fillStyle = "red"; // Färg för skotten
+
+    //För varje skott i arrayen
+    this.bullet.forEach((bullet, index) => {
+      
+      // Rita skottet
+      ctx.fillRect(bullet.x, bullet.y, this.bulletSize, this.bulletSize);
+  
+      //Flytta skottet
+      if (bullet.direction === "up") bullet.y -= bullet.speed;
+      if (bullet.direction === "down") bullet.y += bullet.speed;
+      if (bullet.direction === "left") bullet.x -= bullet.speed;
+      if (bullet.direction === "right") bullet.x += bullet.speed;
+  
+      // Ta bort skott om det lämnar canvasen
+      if (
+        bullet.x < 0 ||
+        bullet.x > canvas.width ||
+        bullet.y < 0 ||
+        bullet.y > canvas.height
+      ) {
+        this.bullet.splice(index, 1);
+      }
     });
   }
+
 }
 
 //Zombie
@@ -87,200 +114,201 @@ class Game {
     this.tilemap.src = "assets/free.png"; //Källan på bilden
     this.tiles = [
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 6, type: "not_walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 28, type: "walkable" },
       ],
+      
     ];
   }
 
@@ -326,15 +354,27 @@ class Game {
     }
   }
 
-  updateGame() {
-    this.bullet.forEach((bullet) => {
-      if (bulletHandeler.direction === "up") bullet.y--;
-      if (bulletHandeler.direction === "down") bullet.y++;
-      if (bulletHandeler.direction === "left") bullet.x--;
-      if (bulletHandeler.direction === "right") bullet.x++;
-    });
+  //Kordinat på spelaren och vart man kan gå
+  isTileWalkable(x, y, allowedTypes = ["walkable"]) {
+    const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på
+    const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på
+  
+    
+    if (tileX < 0 || tileY < 0 || tileY >= this.tiles.length || tileX >= this.tiles[0].length) {
+      return false;
+    }
+  
+  
+    return allowedTypes.includes(this.tiles[tileY][tileX].type);
   }
+
 }
+
+//Definerar player och zombies och bullets
+const bulletHandeler = new Bullets();
+const player = new Player();
+const zombie = new Zombie();
+const game = new Game();
 
 //håller koll vilka som är nedtrckta
 const keys = {
@@ -342,31 +382,55 @@ const keys = {
   a: false,
   s: false,
   d: false,
+  ArrowUp: false,
+  ArrowDown: false,
+  ArrowLeft: false,
+  ArrowRight: false,
+  Space: false,
 }
 
 document.addEventListener("keydown", (e) => {
-  //Flytta gubbe
+  //Gubbe
 
   if (e.key === "w") keys.w = true;
   if (e.key === "s") keys.s = true;
   if (e.key === "a") keys.a = true;
   if (e.key === "d") keys.d = true;
+
+  //Skott
+  if (e.key === "ArrowUp") {
+    keys.ArrowUp = true;
+    bulletHandeler.direction = "up";
+  }
+  if (e.key === "ArrowDown") {
+    keys.ArrowDown = true;
+    bulletHandeler.direction = "down";
+  } 
+  if (e.key === "ArrowLeft") {
+    keys.ArrowLeft = true;
+    bulletHandeler.direction = "left";
+  }
+  if (e.key === "ArrowRight"){
+    keys.ArrowRight = true;
+    bulletHandeler.direction = "right";
+  }
+  if (e.key === " ") keys.Space = true;
 });
 
 document.addEventListener("keyup", (e) => {
-  //Sluta flytta gubbe
+  //Gubbe
   if (e.key === "w") keys.w = false;
   if (e.key === "s") keys.s = false;
   if (e.key === "a") keys.a = false;
   if (e.key === "d") keys.d = false;
+
+  //Skott
+  if (e.key === "ArrowUp") keys.ArrowUp = false;
+  if (e.key === "ArrowDown") keys.ArrowDown = false;
+  if (e.key === "ArrowLeft") keys.ArrowLeft = false;
+  if (e.key === "ArrowRight") keys.ArrowRight = false;
+  if (e.key === " ") keys.Space = false; //Sluta skjuta skott
 });
-
-
-//Definerar player och zombies och bullets
-const bulletHandeler = new Bullets();
-const player = new Player();
-const zombie = new Zombie();
-const game = new Game();
 
 //Håller igång spelet
 function gameLoop() {
@@ -378,7 +442,6 @@ function gameLoop() {
   if (keys.w && player.playerY > 0) {
     player.movePlayer("up");
   }
-  
   if (keys.s && player.playerY < canvas.height - player.playerSizeY) {//tar hänsyn till storleken på spelaren med gränserna
     player.movePlayer("down");
   }
@@ -389,6 +452,24 @@ function gameLoop() {
     player.movePlayer("right");
   }
 
+  //om knappen är nedtryckt och om cooldown är noll
+  if (keys.Space && bulletHandeler.shootCooldown === 0) {
+    bulletHandeler.bullet.push({ //lägger till ett skott i arrayen med  x, y och hastighet
+      x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2, // Starta från spelarens mitt
+      y: player.playerY,
+      direction: bulletHandeler.direction,
+      speed: 5, // Hastighet för skottet
+    });
+    //gör cooldown till 20 frames
+    bulletHandeler.shootCooldown = 20; // Återställ cooldown 
+  }
+
+  //minskar cooldown med 1 varje frame
+  if ( bulletHandeler.shootCooldown > 0) {
+    bulletHandeler.shootCooldown--;
+  }
+  
+  
 
   game.drawGame(); //Ritar bakgrunden
   player.drawPlayer(); //Ritar spelaren
