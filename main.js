@@ -1,11 +1,12 @@
 //Player
 class Player {
   constructor() {
-    this.playerSize = 25;//Player size
+    this.playerSizeX = 25;//Player size
+    this.playerSizeY = 50;//Player size
     this.playerSpeed = 1; //Player speed
     this.playerPlayerHealth = 100; //Player health§
-    this.playerX = canvas.width / 2 - this.playerSize / 2; //X position
-    this.playerY = canvas.height / 2 - this.playerSize / 2; //Y position
+    this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
+    this.playerY = canvas.height / 2 - this.playerSizeY / 2; //Y position
     
   }
 
@@ -14,8 +15,8 @@ class Player {
     ctx.fillRect(
       this.playerX, // Use exact pixel position
       this.playerY, // Use exact pixel position
-      this.playerSize,
-      this.playerSize
+      this.playerSizeX,
+      this.playerSizeY
     );
   }
 
@@ -350,28 +351,6 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "s") keys.s = true;
   if (e.key === "a") keys.a = true;
   if (e.key === "d") keys.d = true;
-
-  // if (e.key === "w" && player.playerY > 0) {
-  //   keys.w = true;
-  //   direction = "up";
-  //   player.playerY -= player.playerSpeed; // Move player up
-  // }
-  // if (e.key === "s" && player.playerY < canvas.height) {
-  //   keys.s = true;
-  //   direction = "down";
-  //   player.playerY += player.playerSpeed; // Move player down 
-  // }
-  // if (e.key === "a" && player.playerX > 0) {
-  //   keys.a = true;
-  //   direction = "left";
-  //   player.playerX -= player.playerSpeed; // Move player to the left
-  // }
-  // if (e.key === "d" && player.playerX < canvas.width) {
-  //   keys.d = true;  
-  //   direction = "right";  
-  //   player.playerX += player.playerSpeed; // Move player to the right
-  // }
-
 });
 
 document.addEventListener("keyup", (e) => {
@@ -400,13 +379,13 @@ function gameLoop() {
     player.movePlayer("up");
   }
   
-  if (keys.s && player.playerY < canvas.height - player.playerSize) {//tar hänsyn till storleken på spelaren med gränserna
+  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {//tar hänsyn till storleken på spelaren med gränserna
     player.movePlayer("down");
   }
   if (keys.a && player.playerX > 0) {
     player.movePlayer("left");
   }
-  if (keys.d && player.playerX < canvas.width - player.playerSize) {
+  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {
     player.movePlayer("right");
   }
 
