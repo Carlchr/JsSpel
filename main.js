@@ -1,24 +1,34 @@
 //Player
 class Player {
   constructor() {
-    this.playerSize = 25;
-    this.playerSpeed = 5;
-    this.playerPlayerHealth = 100;
-    this.playerX = 0;
-    this.playerY = 0;
+    this.playerSize = 25;//Player size
+    this.playerSpeed = 1; //Player speed
+    this.playerPlayerHealth = 100; //Player health§
+    this.playerX = canvas.width / 2 - this.playerSize / 2; //X position
+    this.playerY = canvas.height / 2 - this.playerSize / 2; //Y position
+    
   }
 
   drawPlayer() {
     ctx.fillStyle = "blue";
     ctx.fillRect(
-      this.playerX * this.cellSize,
-      this.playerY * this.cellSize,
-      this.cellSize,
-      this.cellSize
+      this.playerX, // Use exact pixel position
+      this.playerY, // Use exact pixel position
+      this.playerSize,
+      this.playerSize
     );
+  }
+
+  movePlayer(direction) {
+    // Update player position based on direction
+    if (direction === "up") this.playerY -= this.playerSpeed;
+    if (direction === "down") this.playerY += this.playerSpeed;
+    if (direction === "left") this.playerX -= this.playerSpeed;
+    if (direction === "right") this.playerX += this.playerSpeed;
   }
 }
 
+//Bullets
 class Bullets {
   constructor() {
     this.bulletDamage = 5;
@@ -67,9 +77,10 @@ const canvas = document.getElementById("gameCanvas");
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d");
 
+//Game
 class Game {
   constructor() {
-    this.gridSize = 10;
+    this.gridSize = 13;
     this.cellSize = 16; //Storlek på tiles
     this.tilemap = new Image(); //Tilemap tar en bild
     this.tilemap.src = "assets/free.png"; //Källan på bilden
@@ -85,15 +96,6 @@ class Game {
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
-      ],
-      [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
@@ -102,15 +104,6 @@ class Game {
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-      ],
-      [
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
@@ -133,15 +126,6 @@ class Game {
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
-      ],
-      [
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
-        { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
@@ -157,20 +141,156 @@ class Game {
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
         { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
       ],
-
-      // Add more rows as needed
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
+      [
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+        { tileIndex: 28, type: "water" },
+      ],
     ];
   }
 
+  //Ritar spelet  
   drawGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); //Tömmer allt
-
     const tilesPerRow = 16; //Tiles på tilemap
     const tilesPerColumn = 12; //tiles per column
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
+
         const { tileIndex } = tile; // Get the tileIndex from the tile object
         const tileX = (tileIndex % tilesPerRow) * this.cellSize; //Räknar ut tileposition i x
         const tileY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize; // R
@@ -184,21 +304,23 @@ class Game {
           this.cellSize,
           this.cellSize,
           x * this.cellSize * 3,
-          y * this.cellSize * 3cs,
+          y * this.cellSize * 3,
           this.cellSize * 3,
           this.cellSize * 3
         );
       });
     });
 
-    // Draw grid lines
+    //Ritar 
     ctx.strokeStyle = "lightgray";
     for (let i = 0; i <= this.gridSize; i++) {
+      
+      //* 3 för att göra rutor 3 ggr större
       ctx.beginPath();
-      ctx.moveTo(i * this.cellSize, 0);
-      ctx.lineTo(i * this.cellSize, canvas.height);
-      ctx.moveTo(0, i * this.cellSize);
-      ctx.lineTo(canvas.width, i * this.cellSize);
+      ctx.moveTo(i * this.cellSize * 3, 0);
+      ctx.lineTo(i * this.cellSize * 3, canvas.height);
+      ctx.moveTo(0, i * this.cellSize * 3);
+      ctx.lineTo(canvas.width, i * this.cellSize * 3);
       ctx.stroke();
     }
   }
@@ -213,54 +335,92 @@ class Game {
   }
 }
 
+//håller koll vilka som är nedtrckta
+const keys = {
+  w: false,
+  a: false,
+  s: false,
+  d: false,
+}
+
 document.addEventListener("keydown", (e) => {
-  //Fixa W och w
-
   //Flytta gubbe
-  if (e.key === "w" && player.playerY > 0) {
-    player.playerY--;
-  }
-  if (e.key === "s" && player.playerY < gridSize - 1) {
-    player.playerY++;
-  }
-  if (e.key === "a" && player.playerX > 0) {
-    player.playerX--;
-  }
-  if (e.key === "d" && player.playerX < gridSize - 1) {
-    player.playerX++;
-  }
 
-  //Flytta skott
-  if (e.key === "ArrowLeft") {
-    bulletHandeler.direction = "left";
-  }
+  if (e.key === "w") keys.w = true;
+  if (e.key === "s") keys.s = true;
+  if (e.key === "a") keys.a = true;
+  if (e.key === "d") keys.d = true;
 
-  if (e.key === "ArrowUp") {
-    bulletHandeler.direction = "up";
-  }
+  // if (e.key === "w" && player.playerY > 0) {
+  //   keys.w = true;
+  //   direction = "up";
+  //   player.playerY -= player.playerSpeed; // Move player up
+  // }
+  // if (e.key === "s" && player.playerY < canvas.height) {
+  //   keys.s = true;
+  //   direction = "down";
+  //   player.playerY += player.playerSpeed; // Move player down 
+  // }
+  // if (e.key === "a" && player.playerX > 0) {
+  //   keys.a = true;
+  //   direction = "left";
+  //   player.playerX -= player.playerSpeed; // Move player to the left
+  // }
+  // if (e.key === "d" && player.playerX < canvas.width) {
+  //   keys.d = true;  
+  //   direction = "right";  
+  //   player.playerX += player.playerSpeed; // Move player to the right
+  // }
 
-  if (e.key === "ArrowRight") {
-    bulletHandeler.direction = "right";
-  }
-
-  if (e.key === "ArrowDown") {
-    bulletHandeler.direction = "down";
-  }
-  if (e.key === " ") {
-    bulletHandeler.bullet.push({
-      x: player.playerX,
-      y: player.playerY,
-      dir: bulletHandeler.direction,
-    });
-  }
-  // drawGame();
 });
 
-//Starta spel
+document.addEventListener("keyup", (e) => {
+  //Sluta flytta gubbe
+  if (e.key === "w") keys.w = false;
+  if (e.key === "s") keys.s = false;
+  if (e.key === "a") keys.a = false;
+  if (e.key === "d") keys.d = false;
+});
+
+
+//Definerar player och zombies och bullets
 const bulletHandeler = new Bullets();
-const zombie = new Zombie();
 const player = new Player();
+const zombie = new Zombie();
 const game = new Game();
+
+//Håller igång spelet
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); //Tömmer canvasen
+
+  //Kollar om knappar är nedtryckta och flyttar spelaren
+
+  //Om knappen är nedtryckt och inom gränserna
+  if (keys.w && player.playerY > 0) {
+    player.movePlayer("up");
+  }
+  
+  if (keys.s && player.playerY < canvas.height - player.playerSize) {//tar hänsyn till storleken på spelaren med gränserna
+    player.movePlayer("down");
+  }
+  if (keys.a && player.playerX > 0) {
+    player.movePlayer("left");
+  }
+  if (keys.d && player.playerX < canvas.width - player.playerSize) {
+    player.movePlayer("right");
+  }
+
+
+  game.drawGame(); //Ritar bakgrunden
+  player.drawPlayer(); //Ritar spelaren
+  bulletHandeler.drawBullet(); //Ritar skotten
+  zombie.drawZombie(); //Ritar zombien
+
+  requestAnimationFrame(gameLoop); // Fortsätter loopen
+}
+
+//Startar game loopen
 game.tilemap.onload = () => {
-  game.drawGame(); //
+  gameLoop();
 };
+
