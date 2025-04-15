@@ -2,7 +2,7 @@
 class Player {
   constructor() {
     this.playerSizeX = 24;//Player size
-    this.playerSizeY = 48;//Player size
+    this.playerSizeY = 47;//Player size
     this.playerSpeed = 1; //Player speed
     this.playerPlayerHealth = 100; //Player health§
     this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
@@ -32,7 +32,7 @@ class Player {
   if (direction === "right") nyX += this.playerSpeed;
 
     //Kollar om  spelare kan gå på tilen
-    if (game.isTileWalkable(nyX, nyY, ["walkable"])) {
+    if (game.isTileWalkable(nyX, nyY, 24 ,47, ["walkable"])) {
       this.playerX = nyX;
       this.playerY = nyY;
     }
@@ -132,7 +132,7 @@ class Game {
         { tileIndex: 28, type: "walkable" },
         { tileIndex: 28, type: "walkable" },
         { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 6, type: "not_walkable" },
         { tileIndex: 28, type: "walkable" },
         { tileIndex: 28, type: "walkable" },
         { tileIndex: 28, type: "walkable" },
@@ -354,18 +354,27 @@ class Game {
   }
 
   //Kordinat på spelaren och vart man kan gå
-  isTileWalkable(x, y, walkable = ["walkable"]) {
+  isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
+    const tileX1 = Math.floor((x+width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken 
     const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+    const tileY1 = Math.floor((y+height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
     const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
   
+    console.log(x,y, tileX, tileY, tileX1, tileY1);
+
     //Om spelaren är utanför kartan, return false
     if (tileX < 0 || tileY < 0 || tileY >= this.tiles.length || tileX >= this.tiles[0].length) {
       return false;
-    } else{
-      //om tiles listan har tilen man står på och om typen är walkable, return true
-      return walkable.includes(this.tiles[tileY][tileX].type);
     }
-
+    
+    //om tiles listan har tilen man står på och om typen är walkable, return true
+      return walkable.includes(this.tiles[tileY][tileX].type) &&
+        walkable.includes(this.tiles[tileY1][tileX1].type) &&
+        walkable.includes(this.tiles[tileY][tileX1].type) &&
+        walkable.includes(this.tiles[tileY1][tileX].type);
+      
+      
+      
 
     
   }
