@@ -32,7 +32,7 @@ class Player {
   if (direction === "right") nyX += this.playerSpeed;
 
     //Kollar om  spelare kan gå på tilen
-    if (game.isTileWalkable(nyX, nyY, 24 ,47, ["walkable"])) {
+    if (game.isTileWalkable(nyX, nyY, this.playerSizeX - 1 ,this.playerSizeY - 1, ["walkable"])) {
       this.playerX = nyX;
       this.playerY = nyY;
     }
@@ -355,9 +355,9 @@ class Game {
 
   //Kordinat på spelaren och vart man kan gå
   isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
-    const tileX1 = Math.floor((x+width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken 
+    const tileX1 = Math.floor((x+width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad) 
     const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-    const tileY1 = Math.floor((y+height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+    const tileY1 = Math.floor((y+height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
     const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
   
     console.log(x,y, tileX, tileY, tileX1, tileY1);
@@ -367,16 +367,11 @@ class Game {
       return false;
     }
     
-    //om tiles listan har tilen man står på och om typen är walkable, return true
-      return walkable.includes(this.tiles[tileY][tileX].type) &&
-        walkable.includes(this.tiles[tileY1][tileX1].type) &&
-        walkable.includes(this.tiles[tileY][tileX1].type) &&
-        walkable.includes(this.tiles[tileY1][tileX].type);
-      
-      
-      
-
-    
+    //om alla delar av gubben är på en tile som är walkable, return true
+    return walkable.includes(this.tiles[tileY][tileX].type) &&
+      walkable.includes(this.tiles[tileY1][tileX1].type) &&
+      walkable.includes(this.tiles[tileY][tileX1].type) &&
+      walkable.includes(this.tiles[tileY1][tileX].type);
   }
 }
 
