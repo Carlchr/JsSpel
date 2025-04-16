@@ -1,13 +1,12 @@
 //Player
 class Player {
   constructor() {
-    this.playerSizeX = 24;//Player size
-    this.playerSizeY = 47;//Player size
+    this.playerSizeX = 24; //Player size
+    this.playerSizeY = 47; //Player size
     this.playerSpeed = 1; //Player speed
     this.playerPlayerHealth = 100; //Player health§
     this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
     this.playerY = canvas.height / 2 - this.playerSizeY / 2; //Y position
-    
   }
 
   drawPlayer() {
@@ -21,23 +20,30 @@ class Player {
   }
 
   movePlayer(direction) {
-  //Temporära variabler för att hålla koll på spelaren
-  let nyX = this.playerX;
-  let nyY = this.playerY;
+    //Temporära variabler för att hålla koll på spelaren
+    let nyX = this.playerX;
+    let nyY = this.playerY;
 
-  //Rör spelaren i den riktning som trycks ned
-  if (direction === "up") nyY -= this.playerSpeed;
-  if (direction === "down") nyY += this.playerSpeed;
-  if (direction === "left") nyX -= this.playerSpeed;
-  if (direction === "right") nyX += this.playerSpeed;
+    //Rör spelaren i den riktning som trycks ned
+    if (direction === "up") nyY -= this.playerSpeed;
+    if (direction === "down") nyY += this.playerSpeed;
+    if (direction === "left") nyX -= this.playerSpeed;
+    if (direction === "right") nyX += this.playerSpeed;
 
     //Kollar om  spelare kan gå på tilen
-    if (game.isTileWalkable(nyX, nyY, this.playerSizeX - 1 ,this.playerSizeY - 1, ["walkable"])) {
+    if (
+      game.isTileWalkable(
+        nyX,
+        nyY,
+        this.playerSizeX - 1,
+        this.playerSizeY - 1,
+        ["walkable"]
+      )
+    ) {
       this.playerX = nyX;
       this.playerY = nyY;
     }
   }
-
 }
 
 //Bullets
@@ -55,16 +61,15 @@ class Bullets {
 
     //För varje skott i arrayen
     this.bullet.forEach((bullet, index) => {
-      
       // Rita skottet
       ctx.fillRect(bullet.x, bullet.y, this.bulletSize, this.bulletSize);
-  
+
       //Flytta skottet
       if (bullet.direction === "up") bullet.y -= bullet.speed;
       if (bullet.direction === "down") bullet.y += bullet.speed;
       if (bullet.direction === "left") bullet.x -= bullet.speed;
       if (bullet.direction === "right") bullet.x += bullet.speed;
-  
+
       // Ta bort skott om det lämnar canvasen
       if (
         bullet.x < 0 ||
@@ -76,7 +81,6 @@ class Bullets {
       }
     });
   }
-
 }
 
 //Zombie
@@ -112,224 +116,223 @@ class Game {
     this.cellSize = 16; //Storlek på tiles
     this.tilemap = new Image(); //Tilemap tar en bild
     this.tilemap.src = "assets/free.png"; //Källan på bilden
+
+    this.overlay = new Image(); //Overlay tar en bild
+    this.overlay.src = "assets/free.png"; //Källan på bilden
+
     this.tiles = [
       [
-        { tileIndex: 0, type: "not_walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 2, type: "walkable" },
-        { tileIndex: 3, type: "walkable" },
-        { tileIndex: 4, type: "walkable" },
-        { tileIndex: 5, type: "walkable" },
+        { tileIndex: 6, type: "not_walkable"},
         { tileIndex: 6, type: "walkable" },
-        { tileIndex: 7, type: "walkable" },
-        { tileIndex: 8, type: "walkable" },
-        { tileIndex: 9, type: "walkable" },
-        { tileIndex: 10, type: "walkable" },
-        { tileIndex: 11, type: "walkable" },
-        { tileIndex: 12, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
       ],
       [
-        { tileIndex: 13, type: "walkable" },
-        { tileIndex: 38, type: "walkable" },
-        { tileIndex: 12, type: "walkable" },
-        { tileIndex: 13, type: "not_walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 15, type: "walkable" },
-        { tileIndex: 16, type: "walkable" },
-        { tileIndex: 17, type: "walkable" },
-        { tileIndex: 18, type: "walkable" },
-        { tileIndex: 19, type: "walkable" },
-        { tileIndex: 20, type: "walkable" },
-        { tileIndex: 21, type: "walkable" },
-        { tileIndex: 22, type: "walkable" },
-      ],
-      [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-      ],
-      [
+        { tileIndex: 6, type: "walkable" },
         { tileIndex: 0, type: "walkable" },
         { tileIndex: 1, type: "walkable" },
         { tileIndex: 2, type: "walkable" },
-        { tileIndex: 3, type: "walkable" },
-        { tileIndex: 4, type: "walkable" },
-        { tileIndex: 5, type: "walkable" },
         { tileIndex: 6, type: "walkable" },
-        { tileIndex: 7, type: "walkable" },
-        { tileIndex: 8, type: "walkable" },
-        { tileIndex: 9, type: "walkable" },
-        { tileIndex: 10, type: "walkable" },
-        { tileIndex: 11, type: "walkable" },
-        { tileIndex: 11, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
         { tileIndex: 19, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 15, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 48 },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 49 },
         { tileIndex: 20, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
       ],
       [
-        { tileIndex: 21, type: "walkable" },
-        { tileIndex: 22, type: "walkable" },
-        { tileIndex: 23, type: "walkable" },
-        { tileIndex: 24, type: "walkable" },
-        { tileIndex: 25, type: "walkable" },
-        { tileIndex: 26, type: "walkable" },
-        { tileIndex: 27, type: "walkable" },
-        { tileIndex: 35, type: "walkable" },
-        { tileIndex: 36, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 61 },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 62 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 16, type: "walkable" },
+        { tileIndex: 17, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 29, type: "walkable" },
         { tileIndex: 30, type: "walkable" },
-        { tileIndex: 31, type: "walkable" },
-        { tileIndex: 32, type: "walkable" },
-        { tileIndex: 33, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
       ],
       [
-        { tileIndex: 34, type: "walkable" },
-        { tileIndex: 35, type: "walkable" },
-        { tileIndex: 36, type: "walkable" },
-        { tileIndex: 37, type: "walkable" },
-        { tileIndex: 38, type: "walkable" },
-        { tileIndex: 39, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
       ],
       [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
       ],
-      [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-      ],
-      [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-      ],
-      [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-      ],
-      [
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-        { tileIndex: 28, type: "walkable" },
-      ],
-      
     ];
   }
 
-  //Ritar spelet  
+  //Ritar spelet
   drawGame() {
-    const tilesPerRow = 13; //Tiles på tilemap
-    const tilesPerColumn = 13; //tiles per column
+    const tilesPerRow = 13; // Tiles per row in the tilemap
+    const tilesPerColumn = 13; // Tiles per column in the tilemap
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
+        const { tileIndex, overlayIndex } = tile;
 
-        const { tileIndex } = tile; //tar indexen på tilen och sätter det som variabeln tile
-        const tileX = (tileIndex % tilesPerRow) * this.cellSize; //Räknar ut tileposition i x
-        const tileY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize; //Räknar ut tileposition i y
+        // Calculate the position of the base tile in the tilemap
+        const tileX = (tileIndex % tilesPerRow) * this.cellSize;
+        const tileY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
 
-        if (y === 0){
-          console.log(tileX, x, tileIndex);
-        }
-        
-
-        //Ritar tilemapen
+        // Draw the base tile
         ctx.drawImage(
           this.tilemap,
           tileX,
@@ -341,42 +344,65 @@ class Game {
           this.cellSize * 3,
           this.cellSize * 3
         );
+
+        //Skapar en duplikat av tilemapen för att kunna rita över den
+        if (overlayIndex !== null) {
+          const overlayX = (overlayIndex % tilesPerRow) * this.cellSize;
+          const overlayY = Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
+
+          ctx.drawImage(
+            this.tilemap, // Use the same tilemap for the overlay
+            overlayX,
+            overlayY,
+            this.cellSize,
+            this.cellSize,
+            x * this.cellSize * 3,
+            y * this.cellSize * 3,
+            this.cellSize * 3,
+            this.cellSize * 3
+          );
+        }
       });
     });
 
-    //Ritar 
-    ctx.strokeStyle = "lightgray";
-    for (let i = 0; i <= this.gridSize; i++) {
-      
-      //* 3 för att göra rutor 3 ggr större
-      ctx.beginPath();
-      ctx.moveTo(i * this.cellSize * 3, 0);
-      ctx.lineTo(i * this.cellSize * 3, canvas.height);
-      ctx.moveTo(0, i * this.cellSize * 3);
-      ctx.lineTo(canvas.width, i * this.cellSize * 3);
-      ctx.stroke();
-    }
+    // Draw grid (optional)
+    // ctx.strokeStyle = "lightgray";
+    // for (let i = 0; i <= this.gridSize; i++) {
+    //   ctx.beginPath();
+    //   ctx.moveTo(i * this.cellSize * 3, 0);
+    //   ctx.lineTo(i * this.cellSize * 3, canvas.height);
+    //   ctx.moveTo(0, i * this.cellSize * 3);
+    //   ctx.lineTo(canvas.width, i * this.cellSize * 3);
+    //   ctx.stroke();
+    // }
   }
 
   //Kordinat på spelaren och vart man kan gå
   isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
-    const tileX1 = Math.floor((x+width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad) 
+    const tileX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
     const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-    const tileY1 = Math.floor((y+height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
+    const tileY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
     const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-  
-    console.log(x,y, tileX, tileY, tileX1, tileY1);
+
+    console.log(x, y, tileX, tileY, tileX1, tileY1);
 
     //Om spelaren är utanför kartan, return false
-    if (tileX < 0 || tileY < 0 || tileY >= this.tiles.length || tileX >= this.tiles[0].length) {
+    if (
+      tileX < 0 ||
+      tileY < 0 ||
+      tileY >= this.tiles.length ||
+      tileX >= this.tiles[0].length
+    ) {
       return false;
     }
-    
+
     //om alla delar av gubben är på en tile som är walkable, return true
-    return walkable.includes(this.tiles[tileY][tileX].type) &&
+    return (
+      walkable.includes(this.tiles[tileY][tileX].type) &&
       walkable.includes(this.tiles[tileY1][tileX1].type) &&
       walkable.includes(this.tiles[tileY][tileX1].type) &&
-      walkable.includes(this.tiles[tileY1][tileX].type);
+      walkable.includes(this.tiles[tileY1][tileX].type)
+    );
   }
 }
 
@@ -397,7 +423,7 @@ const keys = {
   ArrowLeft: false,
   ArrowRight: false,
   Space: false,
-}
+};
 
 //När knappen trycks ned
 document.addEventListener("keydown", (e) => {
@@ -416,12 +442,12 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowDown") {
     keys.ArrowDown = true;
     bulletHandeler.direction = "down";
-  } 
+  }
   if (e.key === "ArrowLeft") {
     keys.ArrowLeft = true;
     bulletHandeler.direction = "left";
   }
-  if (e.key === "ArrowRight"){
+  if (e.key === "ArrowRight") {
     keys.ArrowRight = true;
     bulletHandeler.direction = "right";
   }
@@ -449,30 +475,39 @@ function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); //Tömmer canvasen
 
   //Om knappen är nedtryckt och inom gränserna
-  if (keys.w && player.playerY > 0) {player.movePlayer("up");}
-  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {player.movePlayer("down");}
-  if (keys.a && player.playerX > 0) {player.movePlayer("left");}
-  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {player.movePlayer("right");}
+  if (keys.w && player.playerY > 0) {
+    player.movePlayer("up");
+  }
+  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {
+    player.movePlayer("down");
+  }
+  if (keys.a && player.playerX > 0) {
+    player.movePlayer("left");
+  }
+  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {
+    player.movePlayer("right");
+  }
 
   //Om knappen är nedtryckt och om cooldown är noll
   if (keys.Space && bulletHandeler.shootCooldown === 0) {
     //Lägger till ett skott i arrayen med  x, y, riktning och hastighet
     bulletHandeler.bullet.push({
-      x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2, // Starta från spelarens mitt
+      x:
+        player.playerX +
+        player.playerSizeX / 2 -
+        bulletHandeler.bulletSize / 2, // Starta från spelarens mitt
       y: player.playerY,
       direction: bulletHandeler.direction,
       speed: 5, // Hastighet för skottet
     });
     //Gör cooldown till 20 frames
-    bulletHandeler.shootCooldown = 20; // Återställ cooldown 
+    bulletHandeler.shootCooldown = 20; // Återställ cooldown
   }
 
   //Minskar cooldown med 1 varje frame
-  if ( bulletHandeler.shootCooldown > 0) {
+  if (bulletHandeler.shootCooldown > 0) {
     bulletHandeler.shootCooldown--;
   }
-  
-  
 
   game.drawGame(); //Ritar bakgrunden
   player.drawPlayer(); //Ritar spelaren
