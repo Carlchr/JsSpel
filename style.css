@@ -16,8 +16,20 @@ h1{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 3.5rem;
 }
-
-
+.rubrik{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.content{
+    margin: 25px;
+}
+.rest_container{
+    width: 50vw;
+    margin: 50px;
+    display: flex;
+    flex-direction: column;
+}
 .game{
     background-color: rgb(169, 179, 172);
     height: 95vh;
