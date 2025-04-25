@@ -1,10 +1,12 @@
+const healthCounter = document.querySelector(".hp");
+
 //Player
 class Player {
   constructor() {
     this.playerSizeX = 24; //Player size
     this.playerSizeY = 47; //Player size
-    this.playerSpeed = 1; //Player speed
-    this.playerPlayerHealth = 100; //Player health§
+    this.playerSpeed = 2; //Player speed
+    this.playerHealth = 100; //Player health§
     this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
     this.playerY = canvas.height / 2 - this.playerSizeY / 2; //Y position
   }
@@ -85,22 +87,49 @@ class Bullets {
 
 //Zombie
 class Zombie {
-  constructor() {
-    this.zombieSize = 15;
-    this.zombieSpeed = 2;
+  constructor(cellSize, startX, startY) {
+    this.zombieSize = 32;
+    this.zombieSpeed = 1;
     this.zombieHealth = 20;
-    this.zombieX = 0;
-    this.zombieY = 0;
+    this.zombieDamage = 5;
+    this.zombieX = startX;
+    this.zombieY = startY;
+    this.cellSize = cellSize;
   }
 
   drawZombie() {
     ctx.fillStyle = "green";
+
     ctx.fillRect(
       this.zombieX * this.cellSize,
       this.zombieY * this.cellSize,
-      this.cellSize,
-      this.cellSize
+      this.zombieSize,
+      this.zombieSize
     );
+  }
+
+  trackPlayer(playerX, playerY) {
+    // Skillnad i position mellan zombien och spelaren
+    const dX = playerX - this.zombieX * this.cellSize;
+    const dY = playerY - this.zombieY * this.cellSize;
+
+    // Pythagoras sats för att beräkna avståndet
+    const distance = Math.sqrt(dX * dX + dY * dY);
+
+    // Om zombien är nära spelaren, sluta röra sig
+    if (distance < 1) {
+      player.playerHealth -= this.zombieDamage; //Skada spelaren
+      console.log("Player health: " + player.playerHealth); //Logga spelarens hälsa
+      return; // Avbryt om zombien är nära spelaren
+    }
+
+    //Räkna ut riktningen
+    const riktningX = dX / distance;
+    const riktningY = dY / distance;
+
+    // Uppdatera zombiens position, cellsize gör att den rör sig rätt på kartan
+    this.zombieX += riktningX * this.zombieSpeed / this.cellSize;
+    this.zombieY += riktningY * this.zombieSpeed / this.cellSize;
   }
 }
 
@@ -364,17 +393,6 @@ class Game {
         }
       });
     });
-
-    // Draw grid (optional)
-    // ctx.strokeStyle = "lightgray";
-    // for (let i = 0; i <= this.gridSize; i++) {
-    //   ctx.beginPath();
-    //   ctx.moveTo(i * this.cellSize * 3, 0);
-    //   ctx.lineTo(i * this.cellSize * 3, canvas.height);
-    //   ctx.moveTo(0, i * this.cellSize * 3);
-    //   ctx.lineTo(canvas.width, i * this.cellSize * 3);
-    //   ctx.stroke();
-    // }
   }
 
   //Kordinat på spelaren och vart man kan gå
@@ -383,8 +401,6 @@ class Game {
     const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
     const tileY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
     const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-
-    console.log(x, y, tileX, tileY, tileX1, tileY1);
 
     //Om spelaren är utanför kartan, return false
     if (
@@ -409,8 +425,12 @@ class Game {
 //Definerar player och zombies och bullets
 const bulletHandeler = new Bullets();
 const player = new Player();
-const zombie = new Zombie();
 const game = new Game();
+const zombie = new Zombie(game.cellSize, 0, 0);
+
+function updateHealthCounter() {
+  healthCounter.textContent = `Player Health: ${player.playerHealth}`; // Uppdatera hälsan i HTML-elementet
+}
 
 //Håller koll vilka som är nedtrckta
 const keys = {
@@ -470,11 +490,50 @@ document.addEventListener("keyup", (e) => {
   if (e.key === " ") keys.Space = false; //Sluta skjuta skott
 });
 
-//Håller igång spelet
-function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); //Tömmer canvasen
+let continueGame = true; // Variabel för att kontrollera om spelet ska fortsätta
 
-  //Om knappen är nedtryckt och inom gränserna
+function checkCollision(player, zombie) {
+  // Spelarens rektangel
+  const playerLeft = player.playerX;
+  const playerRight = player.playerX + player.playerSizeX;
+  const playerTop = player.playerY;
+  const playerBottom = player.playerY + player.playerSizeY;
+
+  // Zombiens rektangel
+  const zombieLeft = zombie.zombieX * zombie.cellSize;
+  const zombieRight = zombieLeft + zombie.zombieSize;
+  const zombieTop = zombie.zombieY * zombie.cellSize;
+  const zombieBottom = zombieTop + zombie.zombieSize;
+
+  // Kontrollera om rektanglarna överlappar
+  return (
+    playerRight > zombieLeft &&
+    playerLeft < zombieRight &&
+    playerBottom > zombieTop &&
+    playerTop < zombieBottom
+  );
+}
+
+function gameLoop() {
+  if (continueGame == false) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  updateHealthCounter();
+
+  // Kontrollera om spelaren kolliderar med zombien
+  if (checkCollision(player, zombie)) {
+    player.playerHealth -= zombie.zombieDamage; // Minska spelarens hälsa
+    console.log("Player health: " + player.playerHealth);
+  }
+
+  // Kontrollera om spelarens hälsa är under eller lika med 0
+  if (player.playerHealth <= 0) {
+    continueGame = false; // Stoppa spelet
+    alert("Game Over!, du dog"); // Visa meddelande
+    return; // Avsluta funktionen
+  }
+
+  // Om knappen är nedtryckt och inom gränserna
   if (keys.w && player.playerY > 0) {
     player.movePlayer("up");
   }
@@ -488,36 +547,34 @@ function gameLoop() {
     player.movePlayer("right");
   }
 
-  //Om knappen är nedtryckt och om cooldown är noll
+  // Om knappen är nedtryckt och om cooldown är noll
   if (keys.Space && bulletHandeler.shootCooldown === 0) {
-    //Lägger till ett skott i arrayen med  x, y, riktning och hastighet
     bulletHandeler.bullet.push({
-      x:
-        player.playerX +
-        player.playerSizeX / 2 -
-        bulletHandeler.bulletSize / 2, // Starta från spelarens mitt
+      x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
       y: player.playerY,
       direction: bulletHandeler.direction,
-      speed: 5, // Hastighet för skottet
+      speed: 5,
     });
-    //Gör cooldown till 20 frames
     bulletHandeler.shootCooldown = 20; // Återställ cooldown
   }
 
-  //Minskar cooldown med 1 varje frame
+  // Minska cooldown med 1 varje frame
   if (bulletHandeler.shootCooldown > 0) {
     bulletHandeler.shootCooldown--;
   }
 
-  game.drawGame(); //Ritar bakgrunden
-  player.drawPlayer(); //Ritar spelaren
-  bulletHandeler.drawBullet(); //Ritar skotten
-  zombie.drawZombie(); //Ritar zombien
+  zombie.trackPlayer(player.playerX, player.playerY);
 
-  requestAnimationFrame(gameLoop); // Fortsätter loopen
+  game.drawGame(); // Ritar bakgrunden
+  player.drawPlayer(); // Ritar spelaren
+  bulletHandeler.drawBullet(); // Ritar skotten
+  zombie.drawZombie(); // Ritar zombien
+
+  requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
 
-//Startar game loopen, och göt det när tilemapen är laddad
+// Startar game loopen när tilemapen är laddad
 game.tilemap.onload = () => {
-  gameLoop();
+  continueGame = true; // Sätt till true när spelet startar
+  requestAnimationFrame(gameLoop); // Starta loopen
 };
