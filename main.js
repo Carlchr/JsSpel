@@ -91,10 +91,11 @@ class Zombie {
     this.zombieSize = 32;
     this.zombieSpeed = 1;
     this.zombieHealth = 20;
-    this.zombieDamage = 5;
+    this.zombieDamage = 1;
     this.zombieX = startX;
     this.zombieY = startY;
     this.cellSize = cellSize;
+    this.attackCooldown = 0;
   }
 
   drawZombie() {
@@ -109,6 +110,23 @@ class Zombie {
   }
 
   trackPlayer(playerX, playerY) {
+    const currentTime = Date.now(); // Get the current time
+
+    // Check if the zombie collides with the player
+    if (checkCollision(player, this)) {
+      // Check if enough time has passed since the last attack
+        if (this.attackCooldown <= 0) {
+          player.playerHealth -= this.zombieDamage; // Reduce player's health
+          console.log("Zombie attacked! Player health:", player.playerHealth);
+          this.attackCooldown = 30;
+          
+        
+      }
+
+      return;   
+  }
+
+
     // Skillnad i position mellan zombien och spelaren
     const dX = playerX - this.zombieX * this.cellSize;
     const dY = playerY - this.zombieY * this.cellSize;
@@ -506,7 +524,7 @@ function checkCollision(player, zombie) {
   const zombieBottom = zombieTop + zombie.zombieSize;
 
   // Kontrollera om rektanglarna överlappar
-  return (
+  return (//om kanterna nuddar så ger den sant
     playerRight > zombieLeft &&
     playerLeft < zombieRight &&
     playerBottom > zombieTop &&
@@ -521,10 +539,10 @@ function gameLoop() {
   updateHealthCounter();
 
   // Kontrollera om spelaren kolliderar med zombien
-  if (checkCollision(player, zombie)) {
-    player.playerHealth -= zombie.zombieDamage; // Minska spelarens hälsa
-    console.log("Player health: " + player.playerHealth);
-  }
+  // if (checkCollision(player, zombie)) {
+  //   player.playerHealth -= zombie.zombieDamage; // Minska spelarens hälsa
+  //   console.log("Player health: " + player.playerHealth);
+  // }
 
   // Kontrollera om spelarens hälsa är under eller lika med 0
   if (player.playerHealth <= 0) {
@@ -562,6 +580,10 @@ function gameLoop() {
   if (bulletHandeler.shootCooldown > 0) {
     bulletHandeler.shootCooldown--;
   }
+  if (zombie.attackCooldown > 0) {
+    zombie.attackCooldown--;
+  }
+  
 
   zombie.trackPlayer(player.playerX, player.playerY);
 
