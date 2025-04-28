@@ -96,12 +96,16 @@ class Zombie {
     this.zombieY = startY;
     this.cellSize = cellSize;
     this.attackCooldown = 0;
+
+    this.image = new Image();
+    this.image.src = "assets/monsters.png";
   }
 
   drawZombie() {
-    ctx.fillStyle = "green";
+    // ctx.fillStyle = "green";
 
-    ctx.fillRect(
+    ctx.drawImage(
+      this.image,
       this.zombieX * this.cellSize,
       this.zombieY * this.cellSize,
       this.zombieSize,
@@ -115,17 +119,14 @@ class Zombie {
     // Check if the zombie collides with the player
     if (checkCollision(player, this)) {
       // Check if enough time has passed since the last attack
-        if (this.attackCooldown <= 0) {
-          player.playerHealth -= this.zombieDamage; // Reduce player's health
-          console.log("Zombie attacked! Player health:", player.playerHealth);
-          this.attackCooldown = 30;
-          
-        
+      if (this.attackCooldown <= 0) {
+        player.playerHealth -= this.zombieDamage; // Reduce player's health
+        console.log("Zombie attacked! Player health:", player.playerHealth);
+        this.attackCooldown = 30;
       }
 
-      return;   
-  }
-
+      return;
+    }
 
     // Skillnad i position mellan zombien och spelaren
     const dX = playerX - this.zombieX * this.cellSize;
@@ -146,8 +147,8 @@ class Zombie {
     const riktningY = dY / distance;
 
     // Uppdatera zombiens position, cellsize gör att den rör sig rätt på kartan
-    this.zombieX += riktningX * this.zombieSpeed / this.cellSize;
-    this.zombieY += riktningY * this.zombieSpeed / this.cellSize;
+    this.zombieX += (riktningX * this.zombieSpeed) / this.cellSize;
+    this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
   }
 }
 
@@ -169,7 +170,7 @@ class Game {
 
     this.tiles = [
       [
-        { tileIndex: 6, type: "not_walkable"},
+        { tileIndex: 6, type: "not_walkable" },
         { tileIndex: 6, type: "walkable" },
         { tileIndex: 6, type: "walkable" },
         { tileIndex: 6, type: "walkable" },
@@ -395,7 +396,8 @@ class Game {
         //Skapar en duplikat av tilemapen för att kunna rita över den
         if (overlayIndex !== null) {
           const overlayX = (overlayIndex % tilesPerRow) * this.cellSize;
-          const overlayY = Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
+          const overlayY =
+            Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
 
           ctx.drawImage(
             this.tilemap, // Use the same tilemap for the overlay
@@ -524,7 +526,8 @@ function checkCollision(player, zombie) {
   const zombieBottom = zombieTop + zombie.zombieSize;
 
   // Kontrollera om rektanglarna överlappar
-  return (//om kanterna nuddar så ger den sant
+  return (
+    //om kanterna nuddar så ger den sant
     playerRight > zombieLeft &&
     playerLeft < zombieRight &&
     playerBottom > zombieTop &&
@@ -568,7 +571,8 @@ function gameLoop() {
   // Om knappen är nedtryckt och om cooldown är noll
   if (keys.Space && bulletHandeler.shootCooldown === 0) {
     bulletHandeler.bullet.push({
-      x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
+      x:
+        player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
       y: player.playerY,
       direction: bulletHandeler.direction,
       speed: 5,
@@ -583,7 +587,6 @@ function gameLoop() {
   if (zombie.attackCooldown > 0) {
     zombie.attackCooldown--;
   }
-  
 
   zombie.trackPlayer(player.playerX, player.playerY);
 
