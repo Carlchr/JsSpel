@@ -101,6 +101,8 @@ class Zombie {
     this.image.src = "assets/monsters.png";
   }
 
+
+
   drawZombie() {
     // ctx.fillStyle = "green";
 
