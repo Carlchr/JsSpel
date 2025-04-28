@@ -101,8 +101,6 @@ class Zombie {
     this.image.src = "assets/monsters.png";
   }
 
-
-
   drawZombie() {
     // ctx.fillStyle = "green";
 
@@ -136,6 +134,7 @@ class Zombie {
         bulletBottom > zombieTop &&
         bulletTop < zombieBottom
       ) {
+        console.log("bullets hit zombi");
         this.zombieHealth -= bullets.bulletDamage; // Minska zombiens hälsa
         bullets.bullet.splice(index, 1); // Ta bort kulan
 
