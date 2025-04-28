@@ -92,11 +92,11 @@ class Zombie {
     this.zombieSpeed = 1;
     this.zombieHealth = 20;
     this.zombieDamage = 1;
+    this.zombie = [];
     this.zombieX = startX;
     this.zombieY = startY;
     this.cellSize = cellSize;
     this.attackCooldown = 0;
-
     this.image = new Image();
     this.image.src = "assets/monsters.png";
   }
@@ -111,6 +111,38 @@ class Zombie {
       this.zombieSize,
       this.zombieSize
     );
+  }
+
+  checkBulletCollision(bullets) {
+    bullets.bullet.forEach((bullet, index) => {
+      // Zombiens rektangel
+      const zombieLeft = this.zombieX * this.cellSize;
+      const zombieRight = zombieLeft + this.zombieSize;
+      const zombieTop = this.zombieY * this.cellSize;
+      const zombieBottom = zombieTop + this.zombieSize;
+
+      // Bulletens rektangel
+      const bulletLeft = bullet.x;
+      const bulletRight = bullet.x + bullets.bulletSize;
+      const bulletTop = bullet.y;
+      const bulletBottom = bullet.y + bullets.bulletSize;
+
+      // Kontrollera om rektanglarna överlappar
+      if (
+        bulletRight > zombieLeft &&
+        bulletLeft < zombieRight &&
+        bulletBottom > zombieTop &&
+        bulletTop < zombieBottom
+      ) {
+        this.zombieHealth -= bullets.bulletDamage; // Minska zombiens hälsa
+        bullets.bullet.splice(index, 1); // Ta bort kulan
+
+        // Om zombiens hälsa är 0 eller mindre, ta bort zombien
+        if (this.zombieHealth <= 0) {
+          console.log("Zombie defeated!");
+        }
+      }
+    });
   }
 
   trackPlayer(playerX, playerY) {
@@ -170,7 +202,7 @@ class Game {
 
     this.tiles = [
       [
-        { tileIndex: 6, type: "not_walkable" },
+        { tileIndex: 6, type: " walkable" },
         { tileIndex: 6, type: "walkable" },
         { tileIndex: 6, type: "walkable" },
         { tileIndex: 6, type: "walkable" },
@@ -589,7 +621,8 @@ function gameLoop() {
   }
 
   zombie.trackPlayer(player.playerX, player.playerY);
-
+  // Kontrollera kollision mellan kulor och zombien
+  zombie.checkBulletCollision(bulletHandeler);
   game.drawGame(); // Ritar bakgrunden
   player.drawPlayer(); // Ritar spelaren
   bulletHandeler.drawBullet(); // Ritar skotten
