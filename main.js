@@ -101,9 +101,12 @@ class Zombie {
     this.image.src = "assets/monsters.png";
     this.respawnCount = 0; // en variabel för att hålla koll på hur många zombies man dödat
   }
-  respawnZombie(gridSize) {
-    this.zombieX = Math.floor(Math.random() * gridSize);
-    this.zombieY = Math.floor(Math.random() * gridSize);
+  respawnZombie() {
+    const maxX = Math.floor(canvas.width / this.cellSize); // Max antal celler i X-led
+    const maxY = Math.floor(canvas.height / this.cellSize); // Max antal celler i Y-led
+
+    this.zombieX = Math.floor(Math.random() * maxX); // Slumpa X-position
+    this.zombieY = Math.floor(Math.random() * maxY); // Slumpa Y-position
     this.zombieHealth = 20; // Återställ hälsan
     this.respawnCount++; // Öka respawn-räknaren
     console.log("Zombie respawned at:", this.zombieX, this.zombieY);
@@ -150,7 +153,7 @@ class Zombie {
         // Om zombiens hälsa är 0 eller mindre, ta bort zombien
         if (this.zombieHealth <= 0) {
           console.log("Zombie defeated!");
-          this.respawnZombie(13, 13); // Respawna zombien någonstans på kartan
+          this.respawnZombie(); // Respawna zombien någonstans på kartan
         }
       }
     });
