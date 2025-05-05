@@ -98,7 +98,7 @@ class Zombie {
     this.cellSize = cellSize;
     this.attackCooldown = 0;
     this.image = new Image();
-    this.image.src = "assets/monsters.png";
+    this.image.src = "assets.monsters.png";
     this.respawnCount = 0; // en variabel för att hålla koll på hur många zombies man dödat
   }
   respawnZombie() {
