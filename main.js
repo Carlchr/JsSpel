@@ -1,4 +1,5 @@
 const healthCounter = document.querySelector(".hp");
+const levelCounter = document.querySelector(".level");
 
 //Player
 class Player {
@@ -56,17 +57,18 @@ class Bullets {
     this.bulletSize = 10;
     this.direction = "right";
     this.shootCooldown = 0;
+    this.shootCooldownMax = 20; // Standardvärde för cooldown
   }
 
   drawBullet() {
     ctx.fillStyle = "red"; // Färg för skotten
 
-    //För varje skott i arrayen
+    // För varje skott i arrayen
     this.bullet.forEach((bullet, index) => {
       // Rita skottet
       ctx.fillRect(bullet.x, bullet.y, this.bulletSize, this.bulletSize);
 
-      //Flytta skottet
+      // Flytta skottet
       if (bullet.direction === "up") bullet.y -= bullet.speed;
       if (bullet.direction === "down") bullet.y += bullet.speed;
       if (bullet.direction === "left") bullet.x -= bullet.speed;
@@ -91,12 +93,12 @@ class Zombie {
     this.zombieSize = 32;
     this.zombieSpeed = 1;
     this.zombieHealth = 20;
-    this.zombieDamage = 1;
+    this.zombieDamage = 5;
+    this.attackCooldown = 0;
     this.zombie = [];
     this.zombieX = startX;
     this.zombieY = startY;
     this.cellSize = cellSize;
-    this.attackCooldown = 0;
     this.image = new Image();
     this.image.src = "monsters.png";
     this.respawnCount = 0; // en variabel för att hålla koll på hur många zombies man dödat
@@ -136,7 +138,7 @@ class Zombie {
       const bulletRight = bullet.x + bullets.bulletSize;
       const bulletTop = bullet.y;
       const bulletBottom = bullet.y + bullets.bulletSize;
-
+      
       // Kontrollera om rektanglarna överlappar
       if (
         bulletRight > zombieLeft &&
@@ -206,6 +208,7 @@ class Game {
   constructor() {
     this.gridSize = 13;
     this.cellSize = 16; //Storlek på tiles
+    this.level = 1; //Nivå
     this.tilemap = new Image(); //Tilemap tar en bild
     this.tilemap.src = "assets/free.png"; //Källan på bilden
 
@@ -497,6 +500,28 @@ let zombie2Spawned = false; // kontrollerar om zombie 2 har spawnats
 function updateHealthCounter() {
   healthCounter.textContent = `Player Health: ${player.playerHealth}`; // Uppdatera hälsan i HTML-elementet
 }
+function updateLevelCounter() {
+  levelCounter.textContent = `Level: ${game.level}`; // Uppdatera hälsan i HTML-elementet
+}
+document.getElementById("classic").addEventListener("click", () => {
+  bulletHandeler.bulletDamage = 5;
+  bulletHandeler.shootCooldownMax = 30; // Sätt maxvärdet för cooldown
+  player.playerHealth = 100; // Återställ spelarens hälsa
+});
+
+document.getElementById("minigun").addEventListener("click", () => {
+  bulletHandeler.bulletDamage = 2;
+  bulletHandeler.shootCooldownMax = 6; // Sätt maxvärdet för cooldown
+  player.playerHealth = 150; // Återställ spelarens hälsa
+  player.playerSpeed = 1.2; 
+});
+
+document.getElementById("shotgun").addEventListener("click", () => {
+  bulletHandeler.bulletDamage = 15;
+  bulletHandeler.shootCooldownMax = 60; // Sätt maxvärdet för cooldown
+  player.playerHealth = 100; // Återställ spelarens hälsa
+  player.playerSpeed = 1.8;
+});
 
 //Håller koll vilka som är nedtrckta
 const keys = {
@@ -609,12 +634,7 @@ function gameLoop() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateHealthCounter();
-
-  // Kontrollera om spelaren kolliderar med zombien
-  // if (checkCollision(player, zombie)) {
-  //   player.playerHealth -= zombie.zombieDamage; // Minska spelarens hälsa
-  //   console.log("Player health: " + player.playerHealth);
-  // }
+  updateLevelCounter();
 
   // Kontrollera om spelarens hälsa är under eller lika med 0
   if (player.playerHealth <= 0) {
@@ -624,18 +644,10 @@ function gameLoop() {
   }
 
   // Om knappen är nedtryckt och inom gränserna
-  if (keys.w && player.playerY > 0) {
-    player.movePlayer("up");
-  }
-  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {
-    player.movePlayer("down");
-  }
-  if (keys.a && player.playerX > 0) {
-    player.movePlayer("left");
-  }
-  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {
-    player.movePlayer("right");
-  }
+  if (keys.w && player.playerY > 0) {player.movePlayer("up");}
+  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {player.movePlayer("down");}
+  if (keys.a && player.playerX > 0) {player.movePlayer("left");}
+  if (keys.d && player.playerX < canvas.width - player.playerSizeX) {player.movePlayer("right");}
 
   // Om knappen är nedtryckt och om cooldown är noll
   if (keys.Space && bulletHandeler.shootCooldown === 0) {
@@ -646,19 +658,16 @@ function gameLoop() {
       direction: bulletHandeler.direction,
       speed: 5,
     });
-    bulletHandeler.shootCooldown = 20; // Återställ cooldown
+    bulletHandeler.shootCooldown = bulletHandeler.shootCooldownMax; // Använd maxvärdet för cooldown
   }
 
   // Minska cooldown med 1 varje frame
-  if (bulletHandeler.shootCooldown > 0) {
-    bulletHandeler.shootCooldown--;
-  }
-  if (zombie.attackCooldown > 0) {
-    zombie.attackCooldown--;
-  }
-  if (zombie2.attackCooldown > 0) {
-    zombie2.attackCooldown--;
-  }
+  if (bulletHandeler.shootCooldown > 0) {bulletHandeler.shootCooldown--;}
+
+  //minskar attackCooldown med 1 varje frame
+  if (zombie.attackCooldown > 0) {zombie.attackCooldown--;}
+  if (zombie2.attackCooldown > 0) {zombie2.attackCooldown--;}
+  
   if (checkZombieCollision(zombie, zombie2)) {
     console.log("Zombies collided!");
     // Hantera kollision, t.ex. justera positioner eller stoppa rörelse
@@ -669,12 +678,10 @@ function gameLoop() {
     zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
   }
   zombie2.trackPlayer(player.playerX, player.playerY);
-  // Kontrollera kollision mellan kulor och zombien nummer 2
-  zombie2.checkBulletCollision(bulletHandeler);
+  zombie2.checkBulletCollision(bulletHandeler);   // Kontrollera kollision mellan kulor och zombien nummer 2
 
   zombie.trackPlayer(player.playerX, player.playerY);
-  // Kontrollera kollision mellan kulor och zombien
-  zombie.checkBulletCollision(bulletHandeler);
+  zombie.checkBulletCollision(bulletHandeler);  // Kontrollera kollision mellan kulor och zombien
 
   game.drawGame(); // Ritar bakgrunden
   player.drawPlayer(); // Ritar spelaren
