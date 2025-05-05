@@ -493,6 +493,8 @@ const bulletHandeler = new Bullets();
 const player = new Player();
 const game = new Game();
 const zombie = new Zombie(game.cellSize, 0, 0);
+const zombie2 = new Zombie(game.cellSize, 10, 0);
+let zombie2Spawned = false; // kontrollerar om zombie 2 har spawnats
 
 function updateHealthCounter() {
   healthCounter.textContent = `Player Health: ${player.playerHealth}`; // Uppdatera hälsan i HTML-elementet
@@ -581,6 +583,29 @@ function checkCollision(player, zombie) {
   );
 }
 
+function checkZombieCollision(zombie1, zombie2) {
+  // Samma som övre fast för zombie 1 och 2
+  // Zombie 1:s rektangel
+  const zombie1Left = zombie1.zombieX * zombie1.cellSize;
+  const zombie1Right = zombie1Left + zombie1.zombieSize;
+  const zombie1Top = zombie1.zombieY * zombie1.cellSize;
+  const zombie1Bottom = zombie1Top + zombie1.zombieSize;
+
+  // Zombie 2:s rektangel
+  const zombie2Left = zombie2.zombieX * zombie2.cellSize;
+  const zombie2Right = zombie2Left + zombie2.zombieSize;
+  const zombie2Top = zombie2.zombieY * zombie2.cellSize;
+  const zombie2Bottom = zombie2Top + zombie2.zombieSize;
+
+  // Kontrollera om rektanglarna överlappar
+  return (
+    zombie1Right > zombie2Left &&
+    zombie1Left < zombie2Right &&
+    zombie1Bottom > zombie2Top &&
+    zombie1Top < zombie2Bottom
+  );
+}
+
 function gameLoop() {
   if (continueGame == false) return;
 
@@ -633,14 +658,31 @@ function gameLoop() {
   if (zombie.attackCooldown > 0) {
     zombie.attackCooldown--;
   }
+  if (zombie2.attackCooldown > 0) {
+    zombie2.attackCooldown--;
+  }
+  if (checkZombieCollision(zombie, zombie2)) {
+    console.log("Zombies collided!");
+    // Hantera kollision, t.ex. justera positioner eller stoppa rörelse
+    zombie.zombieX -= zombie.zombieSpeed / zombie.cellSize;
+    zombie.zombieY -= zombie.zombieSpeed / zombie.cellSize;
+
+    zombie2.zombieX += zombie2.zombieSpeed / zombie2.cellSize;
+    zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
+  }
+  zombie2.trackPlayer(player.playerX, player.playerY);
+  // Kontrollera kollision mellan kulor och zombien nummer 2
+  zombie2.checkBulletCollision(bulletHandeler);
 
   zombie.trackPlayer(player.playerX, player.playerY);
   // Kontrollera kollision mellan kulor och zombien
   zombie.checkBulletCollision(bulletHandeler);
+
   game.drawGame(); // Ritar bakgrunden
   player.drawPlayer(); // Ritar spelaren
   bulletHandeler.drawBullet(); // Ritar skotten
   zombie.drawZombie(); // Ritar zombien
+  zombie2.drawZombie(); //Ritar zombien nummer 2
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
