@@ -177,7 +177,6 @@ class Zombie {
     // Skillnad i position mellan zombien och spelaren
     const dX = playerX - this.zombieX * this.cellSize;
     const dY = playerY - this.zombieY * this.cellSize;
-
     // Pythagoras sats för att beräkna avståndet
     const distance = Math.sqrt(dX * dX + dY * dY);
 
@@ -191,7 +190,6 @@ class Zombie {
     //Räkna ut riktningen
     const riktningX = dX / distance;
     const riktningY = dY / distance;
-
     // Uppdatera zombiens position, cellsize gör att den rör sig rätt på kartan
     this.zombieX += (riktningX * this.zombieSpeed) / this.cellSize;
     this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
@@ -629,6 +627,8 @@ function checkZombieCollision(zombie1, zombie2) {
   );
 }
 
+let globalRespawnCount = 0; // Variabel för att hålla koll på hur många zombies som dött
+
 function gameLoop() {
   if (continueGame == false) return;
 
@@ -636,12 +636,21 @@ function gameLoop() {
   updateHealthCounter();
   updateLevelCounter();
 
+  globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; // Håller koll på hur många zombies som dött
+
   // Kontrollera om spelarens hälsa är under eller lika med 0
   if (player.playerHealth <= 0) {
     continueGame = false; // Stoppa spelet
     alert("Game Over!, du dog"); // Visa meddelande
     return; // Avsluta funktionen
   }
+
+  if (globalZombieRespawnCount % 10 === 0 && globalZombieRespawnCount > 0) {
+    game.level++; // Öka nivån med 1
+    zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
+    zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
+    console.log("Level up! Current level:", game.level); // Logga nivån
+  } 
 
   // Om knappen är nedtryckt och inom gränserna
   if (keys.w && player.playerY > 0) {player.movePlayer("up");}
@@ -691,6 +700,8 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
+
+
 
 // Startar game loopen när tilemapen är laddad
 game.tilemap.onload = () => {
