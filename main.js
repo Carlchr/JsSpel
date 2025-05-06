@@ -606,6 +606,8 @@ function checkZombieCollision(zombie1, zombie2) {
   );
 }
 
+let zombieCollisionTimer = 0; // Timer för att hantera fördröjning vid kollision
+
 function gameLoop() {
   if (continueGame == false) return;
 
@@ -661,9 +663,10 @@ function gameLoop() {
   if (zombie2.attackCooldown > 0) {
     zombie2.attackCooldown--;
   }
+  // Kontrollera kollision mellan zombier
   if (checkZombieCollision(zombie, zombie2)) {
     console.log("Zombies collided!");
-    // Hantera kollision, t.ex. justera positioner eller stoppa rörelse
+
     zombie.zombieX -= zombie.zombieSpeed / zombie.cellSize;
     zombie.zombieY -= zombie.zombieSpeed / zombie.cellSize;
 

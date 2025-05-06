@@ -93,3 +93,20 @@ function updateGame() {
 
 drawGame();
 updateGame();
+
+if (checkZombieCollision(zombie, zombie2)) {
+  console.log("Zombies collided!");
+  // Hantera kollision, t.ex. justera positioner eller stoppa rörelse
+  zombie.zombieSpeed = 0;
+  zombie2.zombieSpeed = 0;
+} else {
+  // Återställ zombiernas rörelse om de inte kolliderar
+  zombie.zombieSpeed = 1;
+  zombie2.zombieSpeed = 1;
+
+  // zombie.zombieX -= zombie.zombieSpeed / zombie.cellSize;
+  // zombie.zombieY -= zombie.zombieSpeed / zombie.cellSize;
+
+  // zombie2.zombieX += zombie2.zombieSpeed / zombie2.cellSize;
+  // zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
+}
