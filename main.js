@@ -630,7 +630,7 @@ function checkZombieCollision(zombie1, zombie2) {
   );
 }
 
-let globalRespawnCount = 0; // Variabel för att hålla koll på hur många zombies som dött
+let globalZombieRespawnCount = 0; // Variabel för att hålla koll på hur många zombies som dött
 
 function gameLoop() {
   if (continueGame == false) return;
