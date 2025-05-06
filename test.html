@@ -1,18 +1,47 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zombie Grid Game (Canvas)</title>
+    <title>Zombie Game</title>
 
-    <link rel="stylesheet" href="test.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="game">
+        <div class="rest_container">
+            <div class="rubrik"><h1>Zombie Game</h1><br></div>
 
-    <script src="test.js"></script>
+            <div class="content">
+                <p class="player_info">
+                    <div class="hp"></div>
+
+                    <!-- Lite damage, lite delay -->
+                    <div class="minigun">
+                        <button id="minigun">Minigun class: Shoot fast, low damage</button>
+                    </div>
+
+
+                    <!-- Mycket damage, mycket delay -->
+                    <div class="shotgun">
+                        <button id="shotgun">Shotgun: High damage, shoot slow</button>
+                    </div>
+                </p>
+
+            </div>
+        </div>
+        
+
+            <div id="canvas_container">
+                <canvas id="gameCanvas" width="620" height="620"></canvas>
+            </div>
+    </div>
+    
+
+
+    <script src="main.js"></script>
 </body>
 
 </html>
