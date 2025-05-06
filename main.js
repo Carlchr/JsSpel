@@ -99,7 +99,6 @@ class Zombie {
     this.zombieHealth = 20 + 4 * game.level; // Zombiens hälsa ökar med nivån
     this.zombieDamage = 5 + 2 * game.level; // Zombiens skada ökar med nivån
     this.attackCooldown = 0;
-    this.bossHealth = 200; // Bossens hälsa
     this.zombie = [];
     this.zombieX = startX;
     this.zombieY = startY;
