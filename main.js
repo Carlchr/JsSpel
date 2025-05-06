@@ -1,5 +1,7 @@
 const healthCounter = document.querySelector(".hp");
 const levelCounter = document.querySelector(".level");
+const coinCounter = document.querySelector(".coin");
+
 
 //Player
 class Player {
@@ -94,8 +96,8 @@ class Zombie {
   constructor(cellSize, startX, startY) {
     this.zombieSize = 32;
     this.zombieSpeed = 1;
-    this.zombieHealth = 20;
-    this.zombieDamage = 5;
+    this.zombieHealth = 20 + 4 * game.level; // Zombiens hälsa ökar med nivån
+    this.zombieDamage = 5 + 2 * game.level; // Zombiens skada ökar med nivån
     this.attackCooldown = 0;
     this.bossHealth = 200; // Bossens hälsa
     this.zombie = [];
@@ -114,6 +116,7 @@ class Zombie {
     this.zombieY = Math.floor(Math.random() * maxY); // Slumpa Y-position
     this.zombieHealth = 20; // Återställ hälsan
     this.respawnCount++; // Öka respawn-räknaren
+    game.coinCount++; // Öka myntantalet med 1
     console.log("Zombie respawned at:", this.zombieX, this.zombieY);
     console.log("Respawn count:", this.respawnCount);
   }
@@ -210,9 +213,9 @@ class Game {
     this.gridSize = 13;
     this.cellSize = 16; //Storlek på tiles
     this.level = 1; //Nivå
+    this.coinCount = 0; //Antal coins
     this.tilemap = new Image(); //Tilemap tar en bild
     this.tilemap.src = "assets/free.png"; //Källan på bilden
-
     this.overlay = new Image(); //Overlay tar en bild
     this.overlay.src = "assets/free.png"; //Källan på bilden
 
@@ -504,6 +507,9 @@ function updateHealthCounter() {
 function updateLevelCounter() {
   levelCounter.textContent = `Level: ${game.level}`; // Uppdatera hälsan i HTML-elementet
 }
+function updateCoinCounter() {
+  coinCounter.textContent = `Coins: ${game.coinCount}`; // Uppdatera hälsan i HTML-elementet
+}
 document.getElementById("classic").addEventListener("click", () => {
   bulletHandeler.bulletDamage = 5;
   bulletHandeler.shootCooldownMax = 30; // Sätt maxvärdet för cooldown
@@ -534,7 +540,6 @@ const keys = {
   ArrowDown: false,
   ArrowLeft: false,
   ArrowRight: false,
-  Space: false,
 };
 
 //När knappen trycks ned
@@ -563,7 +568,6 @@ document.addEventListener("keydown", (e) => {
     keys.ArrowRight = true;
     bulletHandeler.direction = "right";
   }
-  if (e.key === " ") keys.Space = true;
 });
 
 //När knappen släpps
@@ -579,7 +583,6 @@ document.addEventListener("keyup", (e) => {
   if (e.key === "ArrowDown") keys.ArrowDown = false;
   if (e.key === "ArrowLeft") keys.ArrowLeft = false;
   if (e.key === "ArrowRight") keys.ArrowRight = false;
-  if (e.key === " ") keys.Space = false; //Sluta skjuta skott
 });
 
 let continueGame = true; // Variabel för att kontrollera om spelet ska fortsätta
@@ -638,12 +641,13 @@ function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateHealthCounter();
   updateLevelCounter();
+  updateCoinCounter();
 
   globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; // Håller koll på hur många zombies som dött
   // Kontrollera om spelarens hälsa är under eller lika med 0
   if (player.playerHealth <= 0) {
     continueGame = false; // Stoppa spelet
-    alert("Game Over!, du dog"); // Visa meddelande
+    alert("Game Over!, YOU DIED"); // Visa meddelande
     return; // Avsluta funktionen
   }
 
@@ -671,15 +675,17 @@ function gameLoop() {
   }
 
   // Om knappen är nedtryckt och om cooldown är noll
-  if (keys.Space && bulletHandeler.shootCooldown === 0) {
+  if (
+    bulletHandeler.shootCooldown === 0 &&
+    (keys.ArrowRight || keys.ArrowLeft || keys.ArrowUp || keys.ArrowDown)
+  ) {
     bulletHandeler.bullet.push({
-      x:
-        player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
+      x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
       y: player.playerY,
       direction: bulletHandeler.direction,
       speed: 5,
     });
-    bulletHandeler.shootCooldown = bulletHandeler.shootCooldownMax; // Använd maxvärdet för cooldown
+    bulletHandeler.shootCooldown = bulletHandeler.shootCooldownMax;
   }
 
   // Kontrollera kollision mellan zombier
