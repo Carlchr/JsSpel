@@ -54,7 +54,7 @@ class Bullets {
   constructor() {
     this.bulletDamage = 5;
     this.bullet = [];
-    this.bulletSize = 10;
+    this.bulletSize = 5;
     this.direction = "right";
     this.shootCooldown = 0;
     this.shootCooldownMax = 20; // Standardvärde för cooldown
@@ -65,8 +65,10 @@ class Bullets {
 
     // För varje skott i arrayen
     this.bullet.forEach((bullet, index) => {
-      // Rita skottet
-      ctx.fillRect(bullet.x, bullet.y, this.bulletSize, this.bulletSize);
+      //Rektangel ctx.fillRect(bullet.x, bullet.y, this.bulletSize, this.bulletSize);
+      ctx.beginPath();
+      ctx.arc(bullet.x, bullet.y, this.bulletSize, 0, 2 * Math.PI);
+      ctx.fill()
 
       // Flytta skottet
       if (bullet.direction === "up") bullet.y -= bullet.speed;
@@ -95,6 +97,7 @@ class Zombie {
     this.zombieHealth = 20;
     this.zombieDamage = 5;
     this.attackCooldown = 0;
+    this.bossHealth = 200; // Bossens hälsa
     this.zombie = [];
     this.zombieX = startX;
     this.zombieY = startY;
@@ -124,6 +127,8 @@ class Zombie {
       this.zombieSize
     );
   }
+
+  
 
   checkBulletCollision(bullets) {
     bullets.bullet.forEach((bullet, index) => {
@@ -637,7 +642,6 @@ function gameLoop() {
   updateLevelCounter();
 
   globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; // Håller koll på hur många zombies som dött
-
   // Kontrollera om spelarens hälsa är under eller lika med 0
   if (player.playerHealth <= 0) {
     continueGame = false; // Stoppa spelet
@@ -650,6 +654,8 @@ function gameLoop() {
     zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
     zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
     console.log("Level up! Current level:", game.level); // Logga nivån
+
+    console.log(globalZombieRespawnCount)
   } 
 
   // Om knappen är nedtryckt och inom gränserna
