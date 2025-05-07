@@ -583,7 +583,7 @@ function checkCollision(player, zombie) {
   );
 }
 
-<<<<<<< HEAD
+
 drawGame();
 updateGame();
 
@@ -603,7 +603,7 @@ if (checkZombieCollision(zombie, zombie2)) {
   // zombie2.zombieX += zombie2.zombieSpeed / zombie2.cellSize;
   // zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
 }
-=======
+
 function checkZombieCollision(zombie1, zombie2) {
   // Samma som övre fast för zombie 1 och 2
   // Zombie 1:s rektangel
@@ -707,4 +707,3 @@ game.tilemap.onload = () => {
   continueGame = true; // Sätt till true när spelet startar
   requestAnimationFrame(gameLoop); // Starta loopen
 };
->>>>>>> 031d31f92ebe87d33b5ee0e69706f8609c07bae0

@@ -425,15 +425,15 @@ class Game {
       row.forEach((tile, x) => {
         const { tileIndex, overlayIndex } = tile;
 
-        // Calculate the position of the base tile in the tilemap
-        const tileX = (tileIndex % tilesPerRow) * this.cellSize;
-        const tileY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
+        //Pick tile from tilemap according to tileIndex
+        const tileMapX = (tileIndex % tilesPerRow) * this.cellSize;
+        const tileMapY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
 
         // Draw the base tile
         ctx.drawImage(
           this.tilemap,
-          tileX,
-          tileY,
+          tileMapX,
+          tileMapY,
           this.cellSize,
           this.cellSize,
           x * this.cellSize * 3,
@@ -466,27 +466,27 @@ class Game {
 
   //Kordinat på spelaren och vart man kan gå
   isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
-    const tileX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
-    const tileX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-    const tileY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
-    const tileY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+    const tileMapX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
+    const tileMapX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+    const tileMapY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
+    const tileMapY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
 
     //Om spelaren är utanför kartan, return false
     if (
-      tileX < 0 ||
-      tileY < 0 ||
-      tileY >= this.tiles.length ||
-      tileX >= this.tiles[0].length
+      tileMapX < 0 ||
+      tileMapY < 0 ||
+      tileMapY >= this.tiles.length ||
+      tileMapX >= this.tiles[0].length
     ) {
       return false;
     }
 
     //om alla delar av gubben är på en tile som är walkable, return true
     return (
-      walkable.includes(this.tiles[tileY][tileX].type) &&
-      walkable.includes(this.tiles[tileY1][tileX1].type) &&
-      walkable.includes(this.tiles[tileY][tileX1].type) &&
-      walkable.includes(this.tiles[tileY1][tileX].type)
+      walkable.includes(this.tiles[tileMapY][tileMapX].type) &&
+      walkable.includes(this.tiles[tileMapY1][tileMapX1].type) &&
+      walkable.includes(this.tiles[tileMapY][tileMapX1].type) &&
+      walkable.includes(this.tiles[tileMapY1][tileMapX].type)
     );
   }
 }
