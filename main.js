@@ -104,7 +104,7 @@ class Zombie {
     this.zombieY = startY;
     this.cellSize = cellSize;
     this.image = new Image();
-    this.image.src = "monsters.png";
+    this.image.src = "assets/monsters.png";
     this.respawnCount = 0; // en variabel för att hålla koll på hur många zombies man dödat
   }
   respawnZombie() {
@@ -217,7 +217,6 @@ class Game {
     this.tilemap.src = "assets/Tilemap.png"; //Källan på bilden
     this.overlay = new Image(); //Overlay tar en bild
     this.overlay.src = "assets/Tilemap.png"; //Källan på bilden
-
     this.tiles = [
       [
         { tileIndex: 6, type: " walkable" },
@@ -516,21 +515,25 @@ document.getElementById("classic").addEventListener("click", () => {
 });
 
 document.getElementById("minigun").addEventListener("click", () => {
-  if (game.coinCount >= 15) {
+  if (game.coinCount >= 100) {
     bulletHandeler.bulletDamage = 2;
     bulletHandeler.shootCooldownMax = 6; // Sätt maxvärdet för cooldown
     player.playerHealth = 150; // Återställ spelarens hälsa
     player.playerSpeed = 1.2;
-  }
+    game.coinCount -= 100; // Minska myntantalet med 25
+    updateCoinCounter();
+    }
 });
 
 document.getElementById("shotgun").addEventListener("click", () => {
-  if (game.coinCount >= 50) {
+  if (game.coinCount >= 15) {
     bulletHandeler.bulletDamage = 15;
-  bulletHandeler.shootCooldownMax = 60; // Sätt maxvärdet för cooldown
-  player.playerHealth = 100; // Återställ spelarens hälsa
-  player.playerSpeed = 1.8;
-  }
+    bulletHandeler.shootCooldownMax = 120; // Sätt maxvärdet för cooldown
+    player.playerHealth = 100; // Återställ spelarens hälsa
+    player.playerSpeed = 1.8;
+    game.coinCount -= 15; // Minska myntantalet med 25
+    updateCoinCounter();
+    }
 });
 document.getElementById("hp_enchant").addEventListener("click", () => {
   if (game.coinCount >= 25){
