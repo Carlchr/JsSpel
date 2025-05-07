@@ -97,7 +97,7 @@ class Zombie {
     this.zombieSize = 32;
     this.zombieSpeed = 1;
     this.zombieHealth = 20 + 4 * game.level; // Zombiens hälsa ökar med nivån
-    this.zombieDamage = 5 + 2 * game.level; // Zombiens skada ökar med nivån
+    this.zombieDamage = 5 + game.level; // Zombiens skada ökar med nivån
     this.attackCooldown = 0;
     this.zombie = [];
     this.zombieX = startX;
@@ -115,7 +115,7 @@ class Zombie {
     this.zombieY = Math.floor(Math.random() * maxY); // Slumpa Y-position
     this.zombieHealth = 20; // Återställ hälsan
     this.respawnCount++; // Öka respawn-räknaren
-    game.coinCount++; // Öka myntantalet med 1
+    game.coinCount += game.level; // Öka myntantalet med leveln
     console.log("Zombie respawned at:", this.zombieX, this.zombieY);
     console.log("Respawn count:", this.respawnCount);
   }
@@ -516,18 +516,52 @@ document.getElementById("classic").addEventListener("click", () => {
 });
 
 document.getElementById("minigun").addEventListener("click", () => {
-  bulletHandeler.bulletDamage = 2;
-  bulletHandeler.shootCooldownMax = 6; // Sätt maxvärdet för cooldown
-  player.playerHealth = 150; // Återställ spelarens hälsa
-  player.playerSpeed = 1.2;
+  if (game.coinCount >= 15) {
+    bulletHandeler.bulletDamage = 2;
+    bulletHandeler.shootCooldownMax = 6; // Sätt maxvärdet för cooldown
+    player.playerHealth = 150; // Återställ spelarens hälsa
+    player.playerSpeed = 1.2;
+  }
 });
 
 document.getElementById("shotgun").addEventListener("click", () => {
-  bulletHandeler.bulletDamage = 15;
+  if (game.coinCount >= 50) {
+    bulletHandeler.bulletDamage = 15;
   bulletHandeler.shootCooldownMax = 60; // Sätt maxvärdet för cooldown
   player.playerHealth = 100; // Återställ spelarens hälsa
   player.playerSpeed = 1.8;
+  }
 });
+document.getElementById("hp_enchant").addEventListener("click", () => {
+  if (game.coinCount >= 25){
+    player.playerHealth += 25; // Öka spelarens hälsa med 25
+    game.coinCount -= 25; // Minska myntantalet med 25
+    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
+    updateHealthCounter(); // Uppdatera spelarens hälsa i HTML-elementet
+  }
+});
+document.getElementById("damage_enchant").addEventListener("click", () => {
+  if (game.coinCount >= 25){
+    bulletHandeler.bulletDamage += 3; // Ökater skadan med 3
+    game.coinCount -= 25; // Minska myntantalet med 25
+    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
+  }
+});
+document.getElementById("firerate_enchant").addEventListener("click", () => {
+  if (game.coinCount >= 25){
+    bulletHandeler.shootCooldownMax === shootCooldownMax * 0.75; //Minksar cooldownen med 25%
+    game.coinCount -= 25; // Minska myntantalet med 25
+    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
+  }
+});
+document.getElementById("speed_enchant").addEventListener("click", () => {
+  if (game.coinCount >= 25){
+    player.playerSpeed === player.playerSpeed * 2; //Minksar hastigheten med 25%
+    game.coinCount -= 25; // Minska myntantalet med 25
+    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
+  }
+});
+
 
 //Håller koll vilka som är nedtrckta
 const keys = {
