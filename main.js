@@ -214,9 +214,9 @@ class Game {
     this.level = 1; //Nivå
     this.coinCount = 0; //Antal coins
     this.tilemap = new Image(); //Tilemap tar en bild
-    this.tilemap.src = "assets/free.png"; //Källan på bilden
+    this.tilemap.src = "assets/Tilemap.png"; //Källan på bilden
     this.overlay = new Image(); //Overlay tar en bild
-    this.overlay.src = "assets/free.png"; //Källan på bilden
+    this.overlay.src = "assets/Tilemap.png"; //Källan på bilden
 
     this.tiles = [
       [
