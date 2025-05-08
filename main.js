@@ -13,6 +13,9 @@ import {
 
 import { keys, controls } from "./controls.js";
 import { BackgroundLibrary } from "./backgroundLibrary.js";
+import { Game } from "./game.js";
+import { Bullets } from "./bullet.js";
+import { Zombie } from "./zombie.js";
 import {
   buyCountHp,
   buyCountDmg,
@@ -59,286 +62,123 @@ class Player {
   }
 }
 
-//Bullets
-class Bullets {
-  constructor() {
-    this.bulletDamage = 5;
-    this.bullet = [];
-    this.bulletSize = 5;
-    this.direction = "right";
-    this.shootCooldown = 0;
-    this.shootCooldownMax = 20; // Standardvärde för cooldown
-  }
-}
-
 //Zombie
-class Zombie {
-  constructor(cellSize, startX, startY) {
-    this.zombieSize = 32;
-    this.zombieSpeed = 1;
-    this.zombieHealth = 20 + 4 * game.level; // Zombiens hälsa ökar med nivån
-    this.zombieDamage = 5 + game.level; // Zombiens skada ökar med nivån
-    this.attackCooldown = 0;
-    this.zombie = [];
-    this.zombieX = startX;
-    this.zombieY = startY;
-    this.cellSize = cellSize;
-    this.image = new Image();
-    this.image.src = "assets/monsters.png";
-    this.respawnCount = 0; // en variabel för att hålla koll på hur många zombies man dödat
-  }
-  respawnZombie() {
-    const maxX = Math.floor(canvas.width / this.cellSize); // Max antal celler i X-led
-    const maxY = Math.floor(canvas.height / this.cellSize); // Max antal celler i Y-led
+// class Zombie {
+//   constructor(cellSize, startX, startY) {
+//     this.zombieSize = 32;
+//     this.zombieSpeed = 1;
+//     this.zombieHealth = 20 + 4 * game.level; // Zombiens hälsa ökar med nivån
+//     this.zombieDamage = 5 + game.level; // Zombiens skada ökar med nivån
+//     this.attackCooldown = 0;
+//     this.zombie = [];
+//     this.zombieX = startX;
+//     this.zombieY = startY;
+//     this.cellSize = cellSize;
+//     this.image = new Image();
+//     this.image.src = "assets/monsters.png";
+//     this.respawnCount = 0; // en variabel för att hålla koll på hur många zombies man dödat
+//   }
+//   respawnZombie() {
+//     const maxX = Math.floor(canvas.width / this.cellSize); // Max antal celler i X-led
+//     const maxY = Math.floor(canvas.height / this.cellSize); // Max antal celler i Y-led
 
-    this.zombieX = Math.floor(Math.random() * maxX); // Slumpa X-position
-    this.zombieY = Math.floor(Math.random() * maxY); // Slumpa Y-position
-    this.zombieHealth = 20 + 4 * game.level; // Återställ hälsan
-    this.respawnCount++; // Öka respawn-räknaren
-    game.coinCount += game.level; // Öka myntantalet med leveln
-    console.log("Zombie respawned at:", this.zombieX, this.zombieY);
-    console.log("Respawn count:", this.respawnCount);
-  }
+//     this.zombieX = Math.floor(Math.random() * maxX); // Slumpa X-position
+//     this.zombieY = Math.floor(Math.random() * maxY); // Slumpa Y-position
+//     this.zombieHealth = 20 + 4 * game.level; // Återställ hälsan
+//     this.respawnCount++; // Öka respawn-räknaren
+//     game.coinCount += game.level; // Öka myntantalet med leveln
+//     console.log("Zombie respawned at:", this.zombieX, this.zombieY);
+//     console.log("Respawn count:", this.respawnCount);
+//   }
 
-  drawZombie() {
-    ctx.drawImage(
-      this.image,
-      this.zombieX * this.cellSize,
-      this.zombieY * this.cellSize,
-      this.zombieSize,
-      this.zombieSize
-    );
-  }
+//   drawZombie() {
+//     ctx.drawImage(
+//       this.image,
+//       this.zombieX * this.cellSize,
+//       this.zombieY * this.cellSize,
+//       this.zombieSize,
+//       this.zombieSize
+//     );
+//   }
 
-  checkBulletCollision(bullets) {
-    bullets.bullet.forEach((bullet, index) => {
-      // Zombiens rektangel
-      const zombieLeft = this.zombieX * this.cellSize;
-      const zombieRight = zombieLeft + this.zombieSize;
-      const zombieTop = this.zombieY * this.cellSize;
-      const zombieBottom = zombieTop + this.zombieSize;
+//   checkBulletCollision(bullets) {
+//     bullets.bullet.forEach((bullet, index) => {
+//       // Zombiens rektangel
+//       const zombieLeft = this.zombieX * this.cellSize;
+//       const zombieRight = zombieLeft + this.zombieSize;
+//       const zombieTop = this.zombieY * this.cellSize;
+//       const zombieBottom = zombieTop + this.zombieSize;
 
-      // Bulletens rektangel
-      const bulletLeft = bullet.x;
-      const bulletRight = bullet.x + bullets.bulletSize;
-      const bulletTop = bullet.y;
-      const bulletBottom = bullet.y + bullets.bulletSize;
+//       // Bulletens rektangel
+//       const bulletLeft = bullet.x;
+//       const bulletRight = bullet.x + bullets.bulletSize;
+//       const bulletTop = bullet.y;
+//       const bulletBottom = bullet.y + bullets.bulletSize;
 
-      // Kontrollera om rektanglarna överlappar
-      if (
-        bulletRight > zombieLeft &&
-        bulletLeft < zombieRight &&
-        bulletBottom > zombieTop &&
-        bulletTop < zombieBottom
-      ) {
-        this.zombieHealth -= bullets.bulletDamage; // Minska zombiens hälsa
-        bullets.bullet.splice(index, 1); // Ta bort kulan
+//       // Kontrollera om rektanglarna överlappar
+//       if (
+//         bulletRight > zombieLeft &&
+//         bulletLeft < zombieRight &&
+//         bulletBottom > zombieTop &&
+//         bulletTop < zombieBottom
+//       ) {
+//         this.zombieHealth -= bullets.bulletDamage; // Minska zombiens hälsa
+//         bullets.bullet.splice(index, 1); // Ta bort kulan
 
-        // Om zombiens hälsa är 0 eller mindre, ta bort zombien
-        if (this.zombieHealth <= 0) {
-          this.respawnZombie(); // Respawna zombien någonstans på kartan
-        }
-      }
-    });
-  }
+//         // Om zombiens hälsa är 0 eller mindre, ta bort zombien
+//         if (this.zombieHealth <= 0) {
+//           this.respawnZombie(); // Respawna zombien någonstans på kartan
+//         }
+//       }
+//     });
+//   }
 
-  trackPlayer(playerX, playerY) {
-    const currentTime = Date.now(); // Get the current time
+//   trackPlayer(playerX, playerY) {
+//     const currentTime = Date.now(); // Get the current time
 
-    // Check if the zombie collides with the player
-    if (checkCollision(player, this)) {
-      // Check if enough time has passed since the last attack
-      if (this.attackCooldown <= 0) {
-        player.playerHealth -= this.zombieDamage; // Reduce player's health
-        this.attackCooldown = 30;
-      }
+//     // Check if the zombie collides with the player
+//     if (checkCollision(player, this)) {
+//       // Check if enough time has passed since the last attack
+//       if (this.attackCooldown <= 0) {
+//         player.playerHealth -= this.zombieDamage; // Reduce player's health
+//         this.attackCooldown = 30;
+//       }
 
-      return;
-    }
+//       return;
+//     }
 
-    // Skillnad i position mellan zombien och spelaren
-    const dX = playerX - this.zombieX * this.cellSize;
-    const dY = playerY - this.zombieY * this.cellSize;
-    // Pythagoras sats för att beräkna avståndet
-    const distance = Math.sqrt(dX * dX + dY * dY);
+//     // Skillnad i position mellan zombien och spelaren
+//     const dX = playerX - this.zombieX * this.cellSize;
+//     const dY = playerY - this.zombieY * this.cellSize;
+//     // Pythagoras sats för att beräkna avståndet
+//     const distance = Math.sqrt(dX * dX + dY * dY);
 
-    // Om zombien är nära spelaren, sluta röra sig
-    if (distance < 1) {
-      player.playerHealth -= this.zombieDamage; //Skada spelaren
-      return; // Avbryt om zombien är nära spelaren
-    }
+//     // Om zombien är nära spelaren, sluta röra sig
+//     if (distance < 1) {
+//       player.playerHealth -= this.zombieDamage; //Skada spelaren
+//       return; // Avbryt om zombien är nära spelaren
+//     }
 
-    //Räkna ut riktningen
-    const riktningX = dX / distance;
-    const riktningY = dY / distance;
-    // Uppdatera zombiens position, cellsize gör att den rör sig rätt på kartan
-    this.zombieX += (riktningX * this.zombieSpeed) / this.cellSize;
-    this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
-  }
-}
+//     //Räkna ut riktningen
+//     const riktningX = dX / distance;
+//     const riktningY = dY / distance;
+//     // Uppdatera zombiens position, cellsize gör att den rör sig rätt på kartan
+//     this.zombieX += (riktningX * this.zombieSpeed) / this.cellSize;
+//     this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
+//   }
+// }
 
 const backgroundLibrary = new BackgroundLibrary(); //Skapar en instans av BackgroundLibrary
 
-//Spelet
 const canvas = document.getElementById("gameCanvas");
-/** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d");
-
-//Game
-class Game {
-  constructor() {
-    this.gridSize = 13;
-    this.cellSize = 16; //Storlek på tiles
-    this.level = 1; //Nivå
-    this.coinCount = 0; //Antal coins
-    this.tilemap = new Image(); //Tilemap tar en bild
-    this.tilemap.src = "assets/Tilemap.png"; //Källan på bilden
-    this.overlay = new Image(); //Overlay tar en bild
-    this.overlay.src = "assets/Tilemap.png"; //Källan på bilden
-    this.tiles = backgroundLibrary.background1; //Kebab är en array med bakgrundsbilder
-  }
-
-  //Ritar spelet
-  drawGame() {
-    const tilesPerRow = 13; // Tiles per row in the tilemap
-    const tilesPerColumn = 13; // Tiles per column in the tilemap
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-
-    this.tiles.forEach((row, y) => {
-      row.forEach((tile, x) => {
-        const { tileIndex, overlayIndex } = tile;
-
-        //Pick tile from tilemap according to tileIndex
-        const tileMapX = (tileIndex % tilesPerRow) * this.cellSize;
-        const tileMapY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
-
-        // Draw the base tile
-        ctx.drawImage(
-          this.tilemap,
-          tileMapX,
-          tileMapY,
-          this.cellSize,
-          this.cellSize,
-          x * this.cellSize * 3,
-          y * this.cellSize * 3,
-          this.cellSize * 3,
-          this.cellSize * 3
-        );
-
-        //Skapar en duplikat av tilemapen för att kunna rita över den
-        if (overlayIndex !== null) {
-          const overlayMapX = (overlayIndex % tilesPerRow) * this.cellSize;
-          const overlayMapY = Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
-
-          ctx.drawImage(
-            this.tilemap, // Use the same tilemap for the overlay
-            overlayMapX,
-            overlayMapY,
-            this.cellSize,
-            this.cellSize,
-            x * this.cellSize * 3,
-            y * this.cellSize * 3,
-            this.cellSize * 3,
-            this.cellSize * 3
-          );
-        }
-      });
-    });
-  }
-
-  drawPlayer(player) {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(
-      player.playerX, // Use exact pixel position
-      player.playerY, // Use exact pixel position
-      player.playerSizeX,
-      player.playerSizeY
-    );
-  }
-
-  drawBullets(bullets) {
-    ctx.fillStyle = "red";
-    bullets.bullet.forEach((bullet, index) => {
-      ctx.beginPath();
-      ctx.arc(bullet.x, bullet.y, bullets.bulletSize, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Flytta skottet
-      if (bullet.direction === "up") bullet.y -= bullet.speed;
-      if (bullet.direction === "down") bullet.y += bullet.speed;
-      if (bullet.direction === "left") bullet.x -= bullet.speed;
-      if (bullet.direction === "right") bullet.x += bullet.speed;
-
-      // Ta bort skott om det lämnar canvasen
-      if (
-        bullet.x < 0 ||
-        bullet.x > canvas.width ||
-        bullet.y < 0 ||
-        bullet.y > canvas.height
-      ) {
-        bullets.bullet.splice(index, 1);
-      }
-    });
-  }
-
-  checkDeath() {
-    if (player.playerHealth <= 0) {
-      continueGame = false; // Stoppa spelet
-      alert("Game Over!, YOU DIED"); // Visa meddelande
-      return; // Avsluta funktionen
-    }
-  }
-
-  increaseLevel() {
-    var previousLevel = this.level; //Spara nivån innan den ökar
-    this.level++; //Öka nivån med 1
-    if (previousLevel <= 1 && this.level >= 2) {
-      // this.tilemap.src = "Tilemap_2.png"; 
-      this.overlay.src = "Tilemap_2.png"; 
-      this.tiles = backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
-    }
-
-    zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
-    zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
-    console.log("Level up! Current level:", game.level); // Logga nivån
-    console.log(globalZombieRespawnCount);
-  }
-
-  //Kordinat på spelaren och vart man kan gå
-  isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
-    const tileMapX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
-    const tileMapX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-    const tileMapY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
-    const tileMapY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-
-    //Om spelaren är utanför kartan, return false
-    if (
-      tileMapX < 0 ||
-      tileMapY < 0 ||
-      tileMapY >= this.tiles.length ||
-      tileMapX >= this.tiles[0].length
-    ) {
-      return false;
-    }
-
-    //om alla delar av gubben är på en tile som är walkable, return true
-    return (
-      walkable.includes(this.tiles[tileMapY][tileMapX].type) &&
-      walkable.includes(this.tiles[tileMapY1][tileMapX1].type) &&
-      walkable.includes(this.tiles[tileMapY][tileMapX1].type) &&
-      walkable.includes(this.tiles[tileMapY1][tileMapX].type)
-    );
-  }
-}
 
 //Definerar player och zombies och bullets
 const bulletHandeler = new Bullets();
 const player = new Player();
-const game = new Game();
-const zombie = new Zombie(game.cellSize, 0, 0);
-const zombie2 = new Zombie(game.cellSize, 10, 0);
+const game = new Game(backgroundLibrary, canvas, ctx);
+const zombie = new Zombie(game.cellSize, 0, 0, game, canvas, ctx);
+const zombie2 = new Zombie(game.cellSize, 10, 0, game, canvas, ctx);
 
 //Antal döda zombies
 let globalZombieRespawnCount = 0;
@@ -403,7 +243,7 @@ function checkZombieCollision(zombie1, zombie2) {
   );
 }
 
-//Behövs
+
 function gameLoop() {
   if (continueGame == false) return;
 
@@ -427,16 +267,18 @@ function gameLoop() {
 
   
   //Om man är död
-  game.checkDeath();
+  if (game.checkDeath(player)) {
+    continueGame = false;
+    return;
+  }
+
   //Kontrollerna på spelaren
   controls(bulletHandeler);
-
-  
 
   // Håller koll på hur många zombies som dött
   globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; 
   if (globalZombieRespawnCount % 10 === 0 && globalZombieRespawnCount > 0) {
-    game.increaseLevel(); // Öka nivån
+    game.increaseLevel(zombie, zombie2); // Öka nivån
   }
 
   // Om knappen är nedtryckt och inom gränserna
@@ -490,19 +332,18 @@ function gameLoop() {
     zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
   }
 
-  zombie2.trackPlayer(player.playerX, player.playerY);
-  zombie2.checkBulletCollision(bulletHandeler); // Kontrollera kollision mellan kulor och zombien nummer 2
-
-  zombie.trackPlayer(player.playerX, player.playerY);
-  zombie.checkBulletCollision(bulletHandeler); // Kontrollera kollision mellan kulor och zombien
+  zombie2.trackPlayer(player, game, checkCollision);
+  zombie2.checkBulletCollision(bulletHandeler, game);
+  
+  zombie.trackPlayer(player, game, checkCollision);
+  zombie.checkBulletCollision(bulletHandeler, game);
 
   game.drawGame(); // Ritar bakgrunden och clearar canvasen
   game.drawPlayer(player); // Ritar spelaren
   game.drawBullets(bulletHandeler); // Ritar skotten
-  zombie.drawZombie(); // Ritar zombien
-  zombie2.drawZombie(); //Ritar zombien nummer 2
+  zombie.drawZombie(ctx); // Ritar zombien
+  zombie2.drawZombie(ctx); //Ritar zombien nummer 2
   
-
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
 // Startar game loopen när tilemapen är laddad
