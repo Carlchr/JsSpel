@@ -1,9 +1,25 @@
-const healthCounter = document.querySelector(".hp");
-const levelCounter = document.querySelector(".level");
-const coinCounter = document.querySelector(".coin");
-const zombieHpCounter = document.querySelector(".zombieHp");
-const zombieDmgCounter = document.querySelector(".zombieDmg");
-const coinsPerZombieCounter = document.querySelector(".coinsPerZombie");
+import {
+  updateHealthCounter,
+  updateLevelCounter,
+  updateCoinCounter,
+  updateZombieDmgCounter,
+  updateZombieHpCounter,
+  updateZombieCoinCounter,
+  updateHpButtonText,
+  updateDamageButtonText,
+  updateFirerateButtonText,
+  updateSpeedButtonText
+} from "./ui.js";
+
+import { keys, controls } from "./controls.js";
+import { BackgroundLibrary } from "./backgroundLibrary.js";
+import {
+  buyCountHp,
+  buyCountDmg,
+  buyCountSpeed,
+  buyCountFireRate,
+  buttonClassesEnchant
+} from "./button.js";
 
 //Player
 class Player {
@@ -14,16 +30,6 @@ class Player {
     this.playerHealth = 100; //Player health§
     this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
     this.playerY = canvas.height / 2 - this.playerSizeY / 2; //Y position
-  }
-
-  drawPlayer() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(
-      this.playerX, // Use exact pixel position
-      this.playerY, // Use exact pixel position
-      this.playerSizeX,
-      this.playerSizeY
-    );
   }
 
   movePlayer(direction) {
@@ -62,34 +68,6 @@ class Bullets {
     this.direction = "right";
     this.shootCooldown = 0;
     this.shootCooldownMax = 20; // Standardvärde för cooldown
-  }
-
-  drawBullet() {
-    ctx.fillStyle = "red"; // Färg för skotten
-
-    // För varje skott i arrayen
-    this.bullet.forEach((bullet, index) => {
-      //Rektangel ctx.fillRect(bullet.x, bullet.y, this.bulletSize, this.bulletSize);
-      ctx.beginPath();
-      ctx.arc(bullet.x, bullet.y, this.bulletSize, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Flytta skottet
-      if (bullet.direction === "up") bullet.y -= bullet.speed;
-      if (bullet.direction === "down") bullet.y += bullet.speed;
-      if (bullet.direction === "left") bullet.x -= bullet.speed;
-      if (bullet.direction === "right") bullet.x += bullet.speed;
-
-      // Ta bort skott om det lämnar canvasen
-      if (
-        bullet.x < 0 ||
-        bullet.x > canvas.width ||
-        bullet.y < 0 ||
-        bullet.y > canvas.height
-      ) {
-        this.bullet.splice(index, 1);
-      }
-    });
   }
 }
 
@@ -153,13 +131,11 @@ class Zombie {
         bulletBottom > zombieTop &&
         bulletTop < zombieBottom
       ) {
-        console.log("bullets hit zombi");
         this.zombieHealth -= bullets.bulletDamage; // Minska zombiens hälsa
         bullets.bullet.splice(index, 1); // Ta bort kulan
 
         // Om zombiens hälsa är 0 eller mindre, ta bort zombien
         if (this.zombieHealth <= 0) {
-          console.log("Zombie defeated!");
           this.respawnZombie(); // Respawna zombien någonstans på kartan
         }
       }
@@ -174,7 +150,6 @@ class Zombie {
       // Check if enough time has passed since the last attack
       if (this.attackCooldown <= 0) {
         player.playerHealth -= this.zombieDamage; // Reduce player's health
-        console.log("Zombie attacked! Player health:", player.playerHealth);
         this.attackCooldown = 30;
       }
 
@@ -190,7 +165,6 @@ class Zombie {
     // Om zombien är nära spelaren, sluta röra sig
     if (distance < 1) {
       player.playerHealth -= this.zombieDamage; //Skada spelaren
-      console.log("Player health: " + player.playerHealth); //Logga spelarens hälsa
       return; // Avbryt om zombien är nära spelaren
     }
 
@@ -202,6 +176,8 @@ class Zombie {
     this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
   }
 }
+
+const backgroundLibrary = new BackgroundLibrary(); //Skapar en instans av BackgroundLibrary
 
 //Spelet
 const canvas = document.getElementById("gameCanvas");
@@ -219,209 +195,16 @@ class Game {
     this.tilemap.src = "assets/Tilemap.png"; //Källan på bilden
     this.overlay = new Image(); //Overlay tar en bild
     this.overlay.src = "assets/Tilemap.png"; //Källan på bilden
-    this.tiles = [
-      [
-        { tileIndex: 6, type: " walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-      ],
-      [
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 0, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 2, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-      ],
-      [
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 19, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 15, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-        { tileIndex: 6, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 48 },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 49 },
-        { tileIndex: 20, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-        { tileIndex: 1, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 61 },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 62 },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 16, type: "walkable" },
-        { tileIndex: 17, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 29, type: "walkable" },
-        { tileIndex: 30, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-      [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-      ],
-    ];
+    this.tiles = backgroundLibrary.background1; //Kebab är en array med bakgrundsbilder
   }
 
   //Ritar spelet
   drawGame() {
     const tilesPerRow = 13; // Tiles per row in the tilemap
     const tilesPerColumn = 13; // Tiles per column in the tilemap
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
@@ -446,14 +229,13 @@ class Game {
 
         //Skapar en duplikat av tilemapen för att kunna rita över den
         if (overlayIndex !== null) {
-          const overlayX = (overlayIndex % tilesPerRow) * this.cellSize;
-          const overlayY =
-            Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
+          const overlayMapX = (overlayIndex % tilesPerRow) * this.cellSize;
+          const overlayMapY = Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
 
           ctx.drawImage(
             this.tilemap, // Use the same tilemap for the overlay
-            overlayX,
-            overlayY,
+            overlayMapX,
+            overlayMapY,
             this.cellSize,
             this.cellSize,
             x * this.cellSize * 3,
@@ -464,6 +246,64 @@ class Game {
         }
       });
     });
+  }
+
+  drawPlayer(player) {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(
+      player.playerX, // Use exact pixel position
+      player.playerY, // Use exact pixel position
+      player.playerSizeX,
+      player.playerSizeY
+    );
+  }
+
+  drawBullets(bullets) {
+    ctx.fillStyle = "red";
+    bullets.bullet.forEach((bullet, index) => {
+      ctx.beginPath();
+      ctx.arc(bullet.x, bullet.y, bullets.bulletSize, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Flytta skottet
+      if (bullet.direction === "up") bullet.y -= bullet.speed;
+      if (bullet.direction === "down") bullet.y += bullet.speed;
+      if (bullet.direction === "left") bullet.x -= bullet.speed;
+      if (bullet.direction === "right") bullet.x += bullet.speed;
+
+      // Ta bort skott om det lämnar canvasen
+      if (
+        bullet.x < 0 ||
+        bullet.x > canvas.width ||
+        bullet.y < 0 ||
+        bullet.y > canvas.height
+      ) {
+        bullets.bullet.splice(index, 1);
+      }
+    });
+  }
+
+  checkDeath() {
+    if (player.playerHealth <= 0) {
+      continueGame = false; // Stoppa spelet
+      alert("Game Over!, YOU DIED"); // Visa meddelande
+      return; // Avsluta funktionen
+    }
+  }
+
+  increaseLevel() {
+    var previousLevel = this.level; //Spara nivån innan den ökar
+    this.level++; //Öka nivån med 1
+    if (previousLevel <= 1 && this.level >= 2) {
+      // this.tilemap.src = "Tilemap_2.png"; 
+      this.overlay.src = "Tilemap_2.png"; 
+      this.tiles = backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
+    }
+
+    zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
+    zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
+    console.log("Level up! Current level:", game.level); // Logga nivån
+    console.log(globalZombieRespawnCount);
   }
 
   //Kordinat på spelaren och vart man kan gå
@@ -499,141 +339,24 @@ const player = new Player();
 const game = new Game();
 const zombie = new Zombie(game.cellSize, 0, 0);
 const zombie2 = new Zombie(game.cellSize, 10, 0);
-let zombie2Spawned = false; //kontrollerar om zombie 2 har spawnats
 
-//Till html
-function updateHealthCounter() {
-  healthCounter.textContent = `Player Health: ${player.playerHealth}`; // Uppdatera hälsan i HTML-elementet
-}
-function updateLevelCounter() {
-  levelCounter.textContent = `Level: ${game.level}`; // Uppdatera hälsan i HTML-elementet
-}
-function updateCoinCounter() {
-  coinCounter.textContent = `Coins: ${game.coinCount}`; // Uppdatera hälsan i HTML-elementet
-}
-function updateZombieDmgCounter() {
-  zombieDmgCounter.textContent = `Zombie Damage: ${zombie.zombieDamage}`; // Uppdatera hälsan i HTML-elementet
-}
-function updateZombieHpCounter() {
-  zombieHpCounter.textContent = `Zombie Health: ${20 + 4 * game.level}`; // Uppdatera hälsan i HTML-elementet
-}
-function updateZombieCoinCounter() {
-  coinsPerZombieCounter.textContent = `Coins Per Zombie: ${game.level}`; // Uppdatera hälsan i HTML-elementet
-}
-document.getElementById("classic").addEventListener("click", () => {
-  bulletHandeler.bulletDamage = 5;
-  bulletHandeler.shootCooldownMax = 30; // Sätt maxvärdet för cooldown
-  player.playerHealth = 100; // Återställ spelarens hälsa
+//Antal döda zombies
+let globalZombieRespawnCount = 0;
+// Variabel för att kontrollera om spelet ska fortsätta
+let continueGame = true; 
+
+//Kollar när knapparna klickas
+buttonClassesEnchant({
+  game,
+  player,
+  bulletHandeler,
+  updateCoinCounter,
+  updateHealthCounter,
+  updateHpButtonText,
+  updateDamageButtonText,
+  updateFirerateButtonText,
+  updateSpeedButtonText
 });
-
-document.getElementById("minigun").addEventListener("click", () => {
-  if (game.coinCount >= 100) {
-    bulletHandeler.bulletDamage = 2;
-    bulletHandeler.shootCooldownMax = 6; // Sätt maxvärdet för cooldown
-    player.playerHealth = 150; // Återställ spelarens hälsa
-    player.playerSpeed = 1.2;
-    game.coinCount -= 100; // Minska myntantalet med 25
-    updateCoinCounter();
-    }
-});
-
-document.getElementById("shotgun").addEventListener("click", () => {
-  if (game.coinCount >= 15) {
-    bulletHandeler.bulletDamage = 15;
-    bulletHandeler.shootCooldownMax = 120; // Sätt maxvärdet för cooldown
-    player.playerHealth = 100; // Återställ spelarens hälsa
-    player.playerSpeed = 1.8;
-    game.coinCount -= 15; // Minska myntantalet med 25
-    updateCoinCounter();
-    }
-});
-document.getElementById("hp_enchant").addEventListener("click", () => {
-  if (game.coinCount >= 25){
-    player.playerHealth += 25; // Öka spelarens hälsa med 25
-    game.coinCount -= 25; // Minska myntantalet med 25
-    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
-    updateHealthCounter(); // Uppdatera spelarens hälsa i HTML-elementet
-  }
-});
-document.getElementById("damage_enchant").addEventListener("click", () => {
-  if (game.coinCount >= 25){
-    bulletHandeler.bulletDamage += 3; // Ökater skadan med 3
-    game.coinCount -= 25; // Minska myntantalet med 25
-    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
-  }
-});
-document.getElementById("firerate_enchant").addEventListener("click", () => {
-  if (game.coinCount >= 25){
-    bulletHandeler.shootCooldownMax === shootCooldownMax * 0.75; //Minksar cooldownen med 25%
-    game.coinCount -= 25; // Minska myntantalet med 25
-    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
-  }
-});
-document.getElementById("speed_enchant").addEventListener("click", () => {
-  if (game.coinCount >= 25){
-    player.playerSpeed === player.playerSpeed * 2; //Minksar hastigheten med 25%
-    game.coinCount -= 25; // Minska myntantalet med 25
-    updateCoinCounter(); // Uppdatera myntantalet i HTML-elementet
-  }
-});
-
-
-//Håller koll vilka som är nedtrckta
-const keys = {
-  w: false,
-  a: false,
-  s: false,
-  d: false,
-  ArrowUp: false,
-  ArrowDown: false,
-  ArrowLeft: false,
-  ArrowRight: false,
-};
-
-//När knappen trycks ned
-document.addEventListener("keydown", (e) => {
-  //Gubbe
-
-  if (e.key === "w") keys.w = true;
-  if (e.key === "s") keys.s = true;
-  if (e.key === "a") keys.a = true;
-  if (e.key === "d") keys.d = true;
-
-  //Skott
-  if (e.key === "ArrowUp") {
-    keys.ArrowUp = true;
-    bulletHandeler.direction = "up";
-  }
-  if (e.key === "ArrowDown") {
-    keys.ArrowDown = true;
-    bulletHandeler.direction = "down";
-  }
-  if (e.key === "ArrowLeft") {
-    keys.ArrowLeft = true;
-    bulletHandeler.direction = "left";
-  }
-  if (e.key === "ArrowRight") {
-    keys.ArrowRight = true;
-    bulletHandeler.direction = "right";
-  }
-});
-
-//När knappen släpps
-document.addEventListener("keyup", (e) => {
-  //Gubbe
-  if (e.key === "w") keys.w = false;
-  if (e.key === "s") keys.s = false;
-  if (e.key === "a") keys.a = false;
-  if (e.key === "d") keys.d = false;
-
-  //Skott
-  if (e.key === "ArrowUp") keys.ArrowUp = false;
-  if (e.key === "ArrowDown") keys.ArrowDown = false;
-  if (e.key === "ArrowLeft") keys.ArrowLeft = false;
-  if (e.key === "ArrowRight") keys.ArrowRight = false;
-});
-
-let continueGame = true; // Variabel för att kontrollera om spelet ska fortsätta
 
 function checkCollision(player, zombie) {
   // Spelarens rektangel
@@ -657,7 +380,6 @@ function checkCollision(player, zombie) {
     playerTop < zombieBottom
   );
 }
-
 function checkZombieCollision(zombie1, zombie2) {
   // Samma som övre fast för zombie 1 och 2
   // Zombie 1:s rektangel
@@ -681,35 +403,40 @@ function checkZombieCollision(zombie1, zombie2) {
   );
 }
 
-let globalZombieRespawnCount = 0; // Variabel för att hålla koll på hur många zombies som dött
-
+//Behövs
 function gameLoop() {
   if (continueGame == false) return;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // -------- FÖR HTML SAKER -------- //
 
-  updateHealthCounter();
-  updateLevelCounter();
-  updateCoinCounter();
-  updateZombieCoinCounter();
-  updateZombieHpCounter();
-  updateZombieDmgCounter();
+  //Stats
+  updateHealthCounter(player);
+  updateLevelCounter(game);
+  updateCoinCounter(game);
+  
+  //Zombie
+  updateZombieDmgCounter(zombie);
+  updateZombieHpCounter(game);
+  updateZombieCoinCounter(game);
 
-  globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; // Håller koll på hur många zombies som dött
-  // Kontrollera om spelarens hälsa är under eller lika med 0
-  if (player.playerHealth <= 0) {
-    continueGame = false; // Stoppa spelet
-    alert("Game Over!, YOU DIED"); // Visa meddelande
-    return; // Avsluta funktionen
-  }
+  //Enchantments
+  updateHpButtonText(buyCountHp);
+  updateDamageButtonText(buyCountDmg);
+  updateFirerateButtonText(buyCountFireRate);
+  updateSpeedButtonText(buyCountSpeed);
 
+  
+  //Om man är död
+  game.checkDeath();
+  //Kontrollerna på spelaren
+  controls(bulletHandeler);
+
+  
+
+  // Håller koll på hur många zombies som dött
+  globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; 
   if (globalZombieRespawnCount % 10 === 0 && globalZombieRespawnCount > 0) {
-    game.level++; // Öka nivån med 1
-    zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
-    zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
-    console.log("Level up! Current level:", game.level); // Logga nivån
-
-    console.log(globalZombieRespawnCount);
+    game.increaseLevel(); // Öka nivån
   }
 
   // Om knappen är nedtryckt och inom gränserna
@@ -762,21 +489,22 @@ function gameLoop() {
     zombie2.zombieX += zombie2.zombieSpeed / zombie2.cellSize;
     zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
   }
+
   zombie2.trackPlayer(player.playerX, player.playerY);
   zombie2.checkBulletCollision(bulletHandeler); // Kontrollera kollision mellan kulor och zombien nummer 2
 
   zombie.trackPlayer(player.playerX, player.playerY);
   zombie.checkBulletCollision(bulletHandeler); // Kontrollera kollision mellan kulor och zombien
 
-  game.drawGame(); // Ritar bakgrunden
-  player.drawPlayer(); // Ritar spelaren
-  bulletHandeler.drawBullet(); // Ritar skotten
+  game.drawGame(); // Ritar bakgrunden och clearar canvasen
+  game.drawPlayer(player); // Ritar spelaren
+  game.drawBullets(bulletHandeler); // Ritar skotten
   zombie.drawZombie(); // Ritar zombien
   zombie2.drawZombie(); //Ritar zombien nummer 2
+  
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
-
 // Startar game loopen när tilemapen är laddad
 game.tilemap.onload = () => {
   continueGame = true; // Sätt till true när spelet startar
