@@ -1,7 +1,9 @@
 const healthCounter = document.querySelector(".hp");
 const levelCounter = document.querySelector(".level");
 const coinCounter = document.querySelector(".coin");
-
+const zombieHpCounter = document.querySelector(".zombieHp");
+const zombieDmgCounter = document.querySelector(".zombieDmg");
+const coinsPerZombieCounter = document.querySelector(".coinsPerZombie");
 
 //Player
 class Player {
@@ -113,7 +115,7 @@ class Zombie {
 
     this.zombieX = Math.floor(Math.random() * maxX); // Slumpa X-position
     this.zombieY = Math.floor(Math.random() * maxY); // Slumpa Y-position
-    this.zombieHealth = 20; // Återställ hälsan
+    this.zombieHealth = 20 + 4 * game.level; // Återställ hälsan
     this.respawnCount++; // Öka respawn-räknaren
     game.coinCount += game.level; // Öka myntantalet med leveln
     console.log("Zombie respawned at:", this.zombieX, this.zombieY);
@@ -497,8 +499,9 @@ const player = new Player();
 const game = new Game();
 const zombie = new Zombie(game.cellSize, 0, 0);
 const zombie2 = new Zombie(game.cellSize, 10, 0);
-let zombie2Spawned = false; // kontrollerar om zombie 2 har spawnats
+let zombie2Spawned = false; //kontrollerar om zombie 2 har spawnats
 
+//Till html
 function updateHealthCounter() {
   healthCounter.textContent = `Player Health: ${player.playerHealth}`; // Uppdatera hälsan i HTML-elementet
 }
@@ -507,6 +510,15 @@ function updateLevelCounter() {
 }
 function updateCoinCounter() {
   coinCounter.textContent = `Coins: ${game.coinCount}`; // Uppdatera hälsan i HTML-elementet
+}
+function updateZombieDmgCounter() {
+  zombieDmgCounter.textContent = `Zombie Damage: ${zombie.zombieDamage}`; // Uppdatera hälsan i HTML-elementet
+}
+function updateZombieHpCounter() {
+  zombieHpCounter.textContent = `Zombie Health: ${20 + 4 * game.level}`; // Uppdatera hälsan i HTML-elementet
+}
+function updateZombieCoinCounter() {
+  coinsPerZombieCounter.textContent = `Coins Per Zombie: ${game.level}`; // Uppdatera hälsan i HTML-elementet
 }
 document.getElementById("classic").addEventListener("click", () => {
   bulletHandeler.bulletDamage = 5;
@@ -675,9 +687,13 @@ function gameLoop() {
   if (continueGame == false) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   updateHealthCounter();
   updateLevelCounter();
   updateCoinCounter();
+  updateZombieCoinCounter();
+  updateZombieHpCounter();
+  updateZombieDmgCounter();
 
   globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; // Håller koll på hur många zombies som dött
   // Kontrollera om spelarens hälsa är under eller lika med 0
