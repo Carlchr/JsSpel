@@ -38,6 +38,8 @@ export class Zombie {
       );
     }
   
+    //Går baklänges eftersom man tar bort skotten framifrån
+    //Annars kan man missa om man går igenom arrayen framifrån
     checkBulletCollision(bullets, game) {
         for (let i = bullets.bullet.length - 1; i >= 0; i--) {
           const bullet = bullets.bullet[i];
