@@ -17,6 +17,7 @@ import {
 } from "./ui.js";
 import { controls, keys } from "./controls.js"; // Importera kontrollerna
 import { Player, Zombie, Bullets, Game, BackgroundLibrary } from "./classes.js";
+import { Boss } from "./boss.js"; // Importera bossen
 
 const backgroundLibrary = new BackgroundLibrary(); //Skapar en instans av BackgroundLibrary
 
@@ -33,7 +34,7 @@ const zombie2 = new Zombie(game.cellSize, 10, 0, game, canvas, ctx);
 //Antal döda zombies
 let globalZombieRespawnCount = 0;
 // Variabel för att kontrollera om spelet ska fortsätta
-let continueGame = true; 
+let continueGame = true;
 
 //Kollar när knapparna klickas
 buttonClassesEnchant({
@@ -45,7 +46,7 @@ buttonClassesEnchant({
   updateHpButtonText,
   updateDamageButtonText,
   updateFirerateButtonText,
-  updateSpeedButtonText
+  updateSpeedButtonText,
 });
 
 function checkCollision(player, zombie) {
@@ -92,7 +93,28 @@ function checkZombieCollision(zombie1, zombie2) {
     zombie1Top < zombie2Bottom
   );
 }
+function checkbossCollision(player, boss) {
+  // Spelarens rektangel
+  const playerLeft = player.playerX;
+  const playerRight = player.playerX + player.playerSizeX;
+  const playerTop = player.playerY;
+  const playerBottom = player.playerY + player.playerSizeY;
 
+  // Bossens rektangel
+  const bossLeft = boss.zombieX * boss.cellSize;
+  const bossRight = bossLeft + boss.zombieSize;
+  const bossTop = boss.zombieY * boss.cellSize;
+  const bossBottom = bossTop + boss.zombieSize;
+
+  // Kontrollera om rektanglarna överlappar
+  return (
+    // om kanterna nuddar så ger den sant
+    playerRight > bossLeft &&
+    playerLeft < bossRight &&
+    playerBottom > bossTop &&
+    playerTop < bossBottom
+  );
+}
 
 function gameLoop() {
   if (continueGame == false) return;
@@ -103,7 +125,7 @@ function gameLoop() {
   updateHealthCounter(player);
   updateLevelCounter(game);
   updateCoinCounter(game);
-  
+
   //Zombie
   updateZombieDmgCounter(zombie);
   updateZombieHpCounter(game);
@@ -115,7 +137,6 @@ function gameLoop() {
   updateFirerateButtonText(buyCountFireRate);
   updateSpeedButtonText(buyCountSpeed);
 
-  
   //Om man är död
   if (game.checkDeath(player)) {
     continueGame = false;
@@ -126,7 +147,7 @@ function gameLoop() {
   controls(bulletHandeler);
 
   // Håller koll på hur många zombies som dött
-  globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount; 
+  globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount;
   if (globalZombieRespawnCount % 10 === 0 && globalZombieRespawnCount > 0) {
     game.increaseLevel(zombie, zombie2); // Öka nivån
   }
@@ -151,7 +172,8 @@ function gameLoop() {
     (keys.ArrowRight || keys.ArrowLeft || keys.ArrowUp || keys.ArrowDown)
   ) {
     bulletHandeler.bullet.push({
-      x: player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
+      x:
+        player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
       y: player.playerY,
       direction: bulletHandeler.direction,
       speed: 5,
@@ -171,6 +193,9 @@ function gameLoop() {
   if (zombie2.attackCooldown > 0) {
     zombie2.attackCooldown--;
   }
+  if (boss.attackCooldown > 0) {
+    boss.attackCooldown--;
+  }
 
   if (checkZombieCollision(zombie, zombie2)) {
     console.log("Zombies collided!");
@@ -184,7 +209,7 @@ function gameLoop() {
 
   zombie2.trackPlayer(player, game, checkCollision);
   zombie2.checkBulletCollision(bulletHandeler, game);
-  
+
   zombie.trackPlayer(player, game, checkCollision);
   zombie.checkBulletCollision(bulletHandeler, game);
 
@@ -193,7 +218,7 @@ function gameLoop() {
   game.drawBullets(bulletHandeler); // Ritar skotten
   zombie.drawZombie(ctx); // Ritar zombien
   zombie2.drawZombie(ctx); //Ritar zombien nummer 2
-  
+
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
 
