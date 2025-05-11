@@ -17,26 +17,25 @@ import {
 } from "./ui.js";
 import { controls, keys } from "./controls.js"; // Importera kontrollerna
 import { Player, Zombie, Bullets, Game, BackgroundLibrary } from "./classes.js";
-import { Boss } from "./boss.js"; // Importera bossen
 
-const backgroundLibrary = new BackgroundLibrary(); //Skapar en instans av BackgroundLibrary
+const backgroundLibrary = new BackgroundLibrary(); // Skapar en instans av BackgroundLibrary
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-//Definerar player och zombies och bullets
+// Definerar player och zombies och bullets
 const player = new Player(canvas);
 const bulletHandeler = new Bullets();
 const game = new Game(backgroundLibrary, canvas, ctx);
 const zombie = new Zombie(game.cellSize, 0, 0, game, canvas, ctx);
 const zombie2 = new Zombie(game.cellSize, 10, 0, game, canvas, ctx);
 
-//Antal döda zombies
+// Antal döda zombies
 let globalZombieRespawnCount = 0;
 // Variabel för att kontrollera om spelet ska fortsätta
 let continueGame = true;
 
-//Kollar när knapparna klickas
+// Kollar när knapparna klickas
 buttonClassesEnchant({
   game,
   player,
@@ -64,55 +63,30 @@ function checkCollision(player, zombie) {
 
   // Kontrollera om rektanglarna överlappar
   return (
-    //om kanterna nuddar så ger den sant
     playerRight > zombieLeft &&
     playerLeft < zombieRight &&
     playerBottom > zombieTop &&
     playerTop < zombieBottom
   );
 }
+
 function checkZombieCollision(zombie1, zombie2) {
   // Samma som övre fast för zombie 1 och 2
-  // Zombie 1:s rektangel
   const zombie1Left = zombie1.zombieX * zombie1.cellSize;
   const zombie1Right = zombie1Left + zombie1.zombieSize;
   const zombie1Top = zombie1.zombieY * zombie1.cellSize;
   const zombie1Bottom = zombie1Top + zombie1.zombieSize;
 
-  // Zombie 2:s rektangel
   const zombie2Left = zombie2.zombieX * zombie2.cellSize;
   const zombie2Right = zombie2Left + zombie2.zombieSize;
   const zombie2Top = zombie2.zombieY * zombie2.cellSize;
   const zombie2Bottom = zombie2Top + zombie2.zombieSize;
 
-  // Kontrollera om rektanglarna överlappar
   return (
     zombie1Right > zombie2Left &&
     zombie1Left < zombie2Right &&
     zombie1Bottom > zombie2Top &&
     zombie1Top < zombie2Bottom
-  );
-}
-function checkbossCollision(player, boss) {
-  // Spelarens rektangel
-  const playerLeft = player.playerX;
-  const playerRight = player.playerX + player.playerSizeX;
-  const playerTop = player.playerY;
-  const playerBottom = player.playerY + player.playerSizeY;
-
-  // Bossens rektangel
-  const bossLeft = boss.zombieX * boss.cellSize;
-  const bossRight = bossLeft + boss.zombieSize;
-  const bossTop = boss.zombieY * boss.cellSize;
-  const bossBottom = bossTop + boss.zombieSize;
-
-  // Kontrollera om rektanglarna överlappar
-  return (
-    // om kanterna nuddar så ger den sant
-    playerRight > bossLeft &&
-    playerLeft < bossRight &&
-    playerBottom > bossTop &&
-    playerTop < bossBottom
   );
 }
 
@@ -121,29 +95,29 @@ function gameLoop() {
 
   // -------- FÖR HTML SAKER -------- //
 
-  //Stats
+  // Stats
   updateHealthCounter(player);
   updateLevelCounter(game);
   updateCoinCounter(game);
 
-  //Zombie
+  // Zombie
   updateZombieDmgCounter(zombie);
   updateZombieHpCounter(game);
   updateZombieCoinCounter(game);
 
-  //Enchantments
+  // Enchantments
   updateHpButtonText(buyCountHp);
   updateDamageButtonText(buyCountDmg);
   updateFirerateButtonText(buyCountFireRate);
   updateSpeedButtonText(buyCountSpeed);
 
-  //Om man är död
+  // Om man är död
   if (game.checkDeath(player)) {
     continueGame = false;
     return;
   }
 
-  //Kontrollerna på spelaren
+  // Kontrollerna på spelaren
   controls(bulletHandeler);
 
   // Håller koll på hur många zombies som dött
@@ -186,15 +160,12 @@ function gameLoop() {
     bulletHandeler.shootCooldown--;
   }
 
-  //minskar attackCooldown med 1 varje frame
+  // Minskar attackCooldown med 1 varje frame
   if (zombie.attackCooldown > 0) {
     zombie.attackCooldown--;
   }
   if (zombie2.attackCooldown > 0) {
     zombie2.attackCooldown--;
-  }
-  if (boss.attackCooldown > 0) {
-    boss.attackCooldown--;
   }
 
   if (checkZombieCollision(zombie, zombie2)) {
@@ -217,7 +188,7 @@ function gameLoop() {
   game.drawPlayer(player); // Ritar spelaren
   game.drawBullets(bulletHandeler); // Ritar skotten
   zombie.drawZombie(ctx); // Ritar zombien
-  zombie2.drawZombie(ctx); //Ritar zombien nummer 2
+  zombie2.drawZombie(ctx); // Ritar zombien nummer 2
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }
