@@ -30,6 +30,13 @@ const game = new Game(backgroundLibrary, canvas, ctx);
 const zombie = new Zombie(game.cellSize, 0, 0, game, canvas, ctx);
 const zombie2 = new Zombie(game.cellSize, 10, 0, game, canvas, ctx);
 
+const boss = new Zombie(game.cellSize, 20, 0, game, canvas, ctx);
+// Bossens egenskaper
+boss.zombieSize = 64; // Större storlek än vanliga zombies
+boss.zombieSpeed = 0.5; // Långsammare rörelse
+boss.zombieHealth = 100 + 10 * game.level; // Mer hälsa
+boss.zombieDamage = 20; // Mer skada
+
 // Antal döda zombies
 let globalZombieRespawnCount = 0;
 // Variabel för att kontrollera om spelet ska fortsätta
@@ -67,6 +74,27 @@ function checkCollision(player, zombie) {
     playerLeft < zombieRight &&
     playerBottom > zombieTop &&
     playerTop < zombieBottom
+  );
+}
+function checkBossCollision(player, boss) {
+  // Spelarens rektangel
+  const playerLeft = player.playerX;
+  const playerRight = player.playerX + player.playerSizeX;
+  const playerTop = player.playerY;
+  const playerBottom = player.playerY + player.playerSizeY;
+
+  // Bossens rektangel
+  const bossLeft = boss.zombieX * boss.cellSize;
+  const bossRight = bossLeft + boss.zombieSize;
+  const bossTop = boss.zombieY * boss.cellSize;
+  const bossBottom = bossTop + boss.zombieSize;
+
+  // Kontrollera om rektanglarna överlappar
+  return (
+    playerRight > bossLeft &&
+    playerLeft < bossRight &&
+    playerBottom > bossTop &&
+    playerTop < bossBottom
   );
 }
 
@@ -167,6 +195,9 @@ function gameLoop() {
   if (zombie2.attackCooldown > 0) {
     zombie2.attackCooldown--;
   }
+  if (boss.attackCooldown > 0) {
+    boss.attackCooldown--;
+  }
 
   if (checkZombieCollision(zombie, zombie2)) {
     console.log("Zombies collided!");
@@ -177,18 +208,26 @@ function gameLoop() {
     zombie2.zombieX += zombie2.zombieSpeed / zombie2.cellSize;
     zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
   }
+  if (game.level === 2) {
+    boss.trackBossPlayer(player, game, checkBossCollision);
+    boss.checkBulletCollision(bulletHandeler, game);
+  } else {
+    zombie2.trackPlayer(player, game, checkCollision);
+    zombie2.checkBulletCollision(bulletHandeler, game);
 
-  zombie2.trackPlayer(player, game, checkCollision);
-  zombie2.checkBulletCollision(bulletHandeler, game);
-
-  zombie.trackPlayer(player, game, checkCollision);
-  zombie.checkBulletCollision(bulletHandeler, game);
+    zombie.trackPlayer(player, game, checkCollision);
+    zombie.checkBulletCollision(bulletHandeler, game);
+  }
 
   game.drawGame(); // Ritar bakgrunden och clearar canvasen
   game.drawPlayer(player); // Ritar spelaren
   game.drawBullets(bulletHandeler); // Ritar skotten
-  zombie.drawZombie(ctx); // Ritar zombien
-  zombie2.drawZombie(ctx); // Ritar zombien nummer 2
+  if (game.level === 2) {
+    boss.drawZombie(ctx); // Ritar bossen
+  } else {
+    zombie.drawZombie(ctx); // Ritar zombien
+    zombie2.drawZombie(ctx); // Ritar zombien nummer 2
+  }
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen
 }

@@ -36,657 +36,688 @@ export class Player {
 }
 
 export class Bullets {
-    constructor() {
-      this.bulletDamage = 5;
-      this.bullet = [];
-      this.bulletSize = 5;
-      this.direction = "right";
-      this.shootCooldown = 0;
-      this.shootCooldownMax = 20; // Standardvärde för cooldown
-    }
+  constructor() {
+    this.bulletDamage = 5;
+    this.bullet = [];
+    this.bulletSize = 5;
+    this.direction = "right";
+    this.shootCooldown = 0;
+    this.shootCooldownMax = 20; // Standardvärde för cooldown
   }
+}
 
 export class Zombie {
-    constructor(cellSize, startX, startY, game, canvas, ctx) {
-      this.zombieSize = 32;
-      this.zombieSpeed = 1;
-      this.zombieHealth = 20 + 4 * game.level;
-      this.zombieDamage = 5 + game.level;
-      this.attackCooldown = 0;
-      this.zombie = [];
-      this.zombieX = startX;
-      this.zombieY = startY;
-      this.cellSize = cellSize;
-      this.image = new Image();
-      this.image.src = "assets/monsters.png";
-      this.respawnCount = 0;
-      this.canvas = canvas;
-      this.ctx = ctx;
-    }
-  
-    respawnZombie(game) {
-      const maxX = Math.floor(this.canvas.width / this.cellSize);
-      const maxY = Math.floor(this.canvas.height / this.cellSize);
-  
-      this.zombieX = Math.floor(Math.random() * maxX);
-      this.zombieY = Math.floor(Math.random() * maxY);
-      this.zombieHealth = 20 + 4 * game.level;
-      this.respawnCount++;
-      game.coinCount += game.level;
-      console.log("Respawn count:", this.respawnCount);
-    }
-  
-    drawZombie() {
-      this.ctx.drawImage(
-        this.image,
-        this.zombieX * this.cellSize,
-        this.zombieY * this.cellSize,
-        this.zombieSize,
-        this.zombieSize
-      );
-    }
-  
-    //Går baklänges eftersom man tar bort skotten framifrån
-    //Annars kan man missa om man går igenom arrayen framifrån
-    checkBulletCollision(bullets, game) {
-        for (let i = bullets.bullet.length - 1; i >= 0; i--) {
-          const bullet = bullets.bullet[i];
-          const zombieLeft = this.zombieX * this.cellSize;
-          const zombieRight = zombieLeft + this.zombieSize;
-          const zombieTop = this.zombieY * this.cellSize;
-          const zombieBottom = zombieTop + this.zombieSize;
-      
-          const bulletLeft = bullet.x;
-          const bulletRight = bullet.x + bullets.bulletSize;
-          const bulletTop = bullet.y;
-          const bulletBottom = bullet.y + bullets.bulletSize;
-      
-          if (
-            bulletRight > zombieLeft &&
-            bulletLeft < zombieRight &&
-            bulletBottom > zombieTop &&
-            bulletTop < zombieBottom
-          ) {
-            this.zombieHealth -= bullets.bulletDamage;
-            bullets.bullet.splice(i, 1);
-      
-            if (this.zombieHealth <= 0) {
-              this.respawnZombie(game);
-            }
+  constructor(cellSize, startX, startY, game, canvas, ctx) {
+    this.zombieSize = 32;
+    this.zombieSpeed = 1;
+    this.zombieHealth = 20 + 4 * game.level;
+    this.zombieDamage = 5 + game.level;
+    this.attackCooldown = 0;
+    this.zombie = [];
+    this.zombieX = startX;
+    this.zombieY = startY;
+    this.cellSize = cellSize;
+    this.image = new Image();
+    this.image.src = "assets/monsters.png";
+    this.respawnCount = 0;
+    this.canvas = canvas;
+    this.ctx = ctx;
+  }
+
+  respawnZombie(game) {
+    const maxX = Math.floor(this.canvas.width / this.cellSize);
+    const maxY = Math.floor(this.canvas.height / this.cellSize);
+
+    this.zombieX = Math.floor(Math.random() * maxX);
+    this.zombieY = Math.floor(Math.random() * maxY);
+    this.zombieHealth = 20 + 4 * game.level;
+    this.respawnCount++;
+    game.coinCount += game.level;
+    console.log("Respawn count:", this.respawnCount);
+  }
+
+  drawZombie() {
+    this.ctx.drawImage(
+      this.image,
+      this.zombieX * this.cellSize,
+      this.zombieY * this.cellSize,
+      this.zombieSize,
+      this.zombieSize
+    );
+  }
+
+  //Går baklänges eftersom man tar bort skotten framifrån
+  //Annars kan man missa om man går igenom arrayen framifrån
+  checkBulletCollision(bullets, game) {
+    for (let i = bullets.bullet.length - 1; i >= 0; i--) {
+      const bullet = bullets.bullet[i];
+      const zombieLeft = this.zombieX * this.cellSize;
+      const zombieRight = zombieLeft + this.zombieSize;
+      const zombieTop = this.zombieY * this.cellSize;
+      const zombieBottom = zombieTop + this.zombieSize;
+
+      const bulletLeft = bullet.x;
+      const bulletRight = bullet.x + bullets.bulletSize;
+      const bulletTop = bullet.y;
+      const bulletBottom = bullet.y + bullets.bulletSize;
+
+      if (
+        bulletRight > zombieLeft &&
+        bulletLeft < zombieRight &&
+        bulletBottom > zombieTop &&
+        bulletTop < zombieBottom
+      ) {
+        this.zombieHealth -= bullets.bulletDamage;
+        bullets.bullet.splice(i, 1);
+
+        if (game.level === 2) {
+        } else {
+          if (this.zombieHealth <= 0) {
+            this.respawnZombie(game);
           }
         }
       }
-  
-    trackPlayer(player, game, checkCollision) {
-      if (checkCollision(player, this)) {
-        if (this.attackCooldown <= 0) {
-          player.playerHealth -= this.zombieDamage;
-          this.attackCooldown = 30;
-        }
-        return;
-      }
-  
-      const dX = player.playerX - this.zombieX * this.cellSize;
-      const dY = player.playerY - this.zombieY * this.cellSize;
-      const distance = Math.sqrt(dX * dX + dY * dY);
-  
-      if (distance < 1) {
+    }
+  }
+
+  trackPlayer(player, game, checkCollision) {
+    if (checkCollision(player, this)) {
+      if (this.attackCooldown <= 0) {
         player.playerHealth -= this.zombieDamage;
-        return;
+        this.attackCooldown = 30;
       }
-  
-      const riktningX = dX / distance;
-      const riktningY = dY / distance;
-      this.zombieX += (riktningX * this.zombieSpeed) / this.cellSize;
-      this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
-    }
-  }
-
-  export class BackgroundLibrary {
-    constructor() {
-        this.background1 = [
-          [
-            { tileIndex: 6, type: " walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-          ],
-          [
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 0, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 2, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-          ],
-          [
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 19, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 15, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 48 },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 49 },
-            { tileIndex: 20, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 61 },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 62 },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 16, type: "walkable" },
-            { tileIndex: 17, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 29, type: "walkable" },
-            { tileIndex: 30, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-        ];  
-        
-        this.background2 = [
-          
-    [
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        ],[
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "not_walkable", overlayIndex: 10  },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        { tileIndex: 14, type: "walkable" },
-        ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 16, type: "walkable"},
-            { tileIndex: 27, type: "walkable"},
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 27, type: "walkable" },
-            { tileIndex: 17, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 15, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "not_walkable", overlayIndex: 48 },
-            { tileIndex: 6, type: "not_walkable", overlayIndex: 49 },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 13, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 15, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "not_walkable", overlayIndex: 61 },
-            { tileIndex: 6, type: "not_walkable", overlayIndex: 62 },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 13, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 15, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "not_walkable", overlayIndex: 10  },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 13, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 29, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 2, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 0, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 30, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 15, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 6, type: "walkable" },
-            { tileIndex: 13, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 29, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "not_walkable", overlayIndex: 10  },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 1, type: "walkable" },
-            { tileIndex: 30, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 10  },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "not_walkable", overlayIndex: 10  },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          [
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-            { tileIndex: 14, type: "walkable" },
-          ],
-          
-        ];
-        }
-  }
-
-  export class Game {
-    constructor(backgroundLibrary, canvas, ctx) {
-      this.gridSize = 13;
-      this.cellSize = 16;
-      this.level = 1;
-      this.coinCount = 0;
-      this.tilemap = new Image();
-      this.tilemap.src = "assets/Tilemap.png";
-      this.overlay = new Image();
-      this.overlay.src = "assets/Tilemap.png";
-      this.backgroundLibrary = backgroundLibrary; //Så att jag kan använda backgroundLibrary i klassen
-      this.tiles = this.backgroundLibrary.background1;
-      this.canvas = canvas;
-      this.ctx = ctx;
+      return;
     }
 
-    drawGame() {
-        const tilesPerRow = 13; // Tiles per row in the tilemap
-        const tilesPerColumn = 13; // Tiles per column in the tilemap
-    
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    
-        this.tiles.forEach((row, y) => {
-          row.forEach((tile, x) => {
-            const { tileIndex, overlayIndex } = tile;
-    
-            //Pick tile from tilemap according to tileIndex
-            const tileMapX = (tileIndex % tilesPerRow) * this.cellSize;
-            const tileMapY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
-    
-            // Draw the base tile
-            this.ctx.drawImage(
-              this.tilemap,
-              tileMapX,
-              tileMapY,
-              this.cellSize,
-              this.cellSize,
-              x * this.cellSize * 3,
-              y * this.cellSize * 3,
-              this.cellSize * 3,
-              this.cellSize * 3
-            );
-    
-            //Skapar en duplikat av tilemapen för att kunna rita över den
-            if (overlayIndex !== null) {
-              const overlayMapX = (overlayIndex % tilesPerRow) * this.cellSize;
-              const overlayMapY = Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
-    
-              this.ctx.drawImage(
-                this.tilemap, // Use the same tilemap for the overlay
-                overlayMapX,
-                overlayMapY,
-                this.cellSize,
-                this.cellSize,
-                x * this.cellSize * 3,
-                y * this.cellSize * 3,
-                this.cellSize * 3,
-                this.cellSize * 3
-              );
-            }
-          });
-        });
-      }
+    const dX = player.playerX - this.zombieX * this.cellSize;
+    const dY = player.playerY - this.zombieY * this.cellSize;
+    const distance = Math.sqrt(dX * dX + dY * dY);
 
-      drawPlayer(player) {
-        this.ctx.fillStyle = "blue";
-        this.ctx.fillRect(
-          player.playerX, // Use exact pixel position
-          player.playerY, // Use exact pixel position
-          player.playerSizeX,
-          player.playerSizeY
+    if (distance < 1) {
+      player.playerHealth -= this.zombieDamage;
+      return;
+    }
+
+    const riktningX = dX / distance;
+    const riktningY = dY / distance;
+    this.zombieX += (riktningX * this.zombieSpeed) / this.cellSize;
+    this.zombieY += (riktningY * this.zombieSpeed) / this.cellSize;
+  }
+  trackBossPlayer(player, game, checkBossCollision) {
+    if (checkBossCollision(player, this)) {
+      if (this.attackCooldown <= 0) {
+        player.playerHealth -= this.zombieDamage; // Bossen skadar spelaren
+        this.attackCooldown = 50; // Längre cooldown för bossens attacker
+      }
+      return; // Stoppa bossens rörelse vid kollision
+    }
+
+    const dX = player.playerX - this.zombieX * this.cellSize;
+    const dY = player.playerY - this.zombieY * this.cellSize;
+    const distance = Math.sqrt(dX * dX + dY * dY);
+
+    if (distance < 1) {
+      return; // Om bossen är väldigt nära spelaren, stoppa rörelsen
+    }
+
+    // Bossen rör sig långsammare och mer strategiskt
+    const riktningX = dX / distance;
+    const riktningY = dY / distance;
+    this.zombieX += (riktningX * this.zombieSpeed * 0.8) / this.cellSize; // Bossen rör sig långsammare
+    this.zombieY += (riktningY * this.zombieSpeed * 0.8) / this.cellSize;
+
+    // Kontrollera om bossen är död
+    if (this.zombieHealth <= 0) {
+      game.coinCount += 40; // Ge spelaren 40 coins
+      game.level++; // Öka spelets nivå
+    }
+  }
+}
+
+export class BackgroundLibrary {
+  constructor() {
+    this.background1 = [
+      [
+        { tileIndex: 6, type: " walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+      ],
+      [
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 0, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 2, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+      ],
+      [
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 19, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 15, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 48 },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 49 },
+        { tileIndex: 20, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 61 },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 62 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 16, type: "walkable" },
+        { tileIndex: 17, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 29, type: "walkable" },
+        { tileIndex: 30, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+    ];
+
+    this.background2 = [
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 16, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 27, type: "walkable" },
+        { tileIndex: 17, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 15, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "not_walkable", overlayIndex: 48 },
+        { tileIndex: 6, type: "not_walkable", overlayIndex: 49 },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 13, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 15, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "not_walkable", overlayIndex: 61 },
+        { tileIndex: 6, type: "not_walkable", overlayIndex: 62 },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 13, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 15, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 13, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 29, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 2, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 0, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 30, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 15, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 6, type: "walkable" },
+        { tileIndex: 13, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 29, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 1, type: "walkable" },
+        { tileIndex: 30, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "not_walkable", overlayIndex: 10 },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+      [
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+        { tileIndex: 14, type: "walkable" },
+      ],
+    ];
+  }
+}
+
+export class Game {
+  constructor(backgroundLibrary, canvas, ctx) {
+    this.gridSize = 13;
+    this.cellSize = 16;
+    this.level = 1;
+    this.coinCount = 0;
+    this.tilemap = new Image();
+    this.tilemap.src = "assets/Tilemap.png";
+    this.overlay = new Image();
+    this.overlay.src = "assets/Tilemap.png";
+    this.backgroundLibrary = backgroundLibrary; //Så att jag kan använda backgroundLibrary i klassen
+    this.tiles = this.backgroundLibrary.background1;
+    this.canvas = canvas;
+    this.ctx = ctx;
+  }
+
+  drawGame() {
+    const tilesPerRow = 13; // Tiles per row in the tilemap
+    const tilesPerColumn = 13; // Tiles per column in the tilemap
+
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.tiles.forEach((row, y) => {
+      row.forEach((tile, x) => {
+        const { tileIndex, overlayIndex } = tile;
+
+        //Pick tile from tilemap according to tileIndex
+        const tileMapX = (tileIndex % tilesPerRow) * this.cellSize;
+        const tileMapY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
+
+        // Draw the base tile
+        this.ctx.drawImage(
+          this.tilemap,
+          tileMapX,
+          tileMapY,
+          this.cellSize,
+          this.cellSize,
+          x * this.cellSize * 3,
+          y * this.cellSize * 3,
+          this.cellSize * 3,
+          this.cellSize * 3
         );
-      }
 
-      drawBullets(bullets) {
-        this.ctx.fillStyle = "red";
-        bullets.bullet.forEach((bullet, index) => {
-            this.ctx.beginPath();
-            this.ctx.arc(bullet.x, bullet.y, bullets.bulletSize, 0, 2 * Math.PI);
-            this.ctx.fill();
-    
-          // Flytta skottet
-          if (bullet.direction === "up") bullet.y -= bullet.speed;
-          if (bullet.direction === "down") bullet.y += bullet.speed;
-          if (bullet.direction === "left") bullet.x -= bullet.speed;
-          if (bullet.direction === "right") bullet.x += bullet.speed;
-    
-          // Ta bort skott om det lämnar canvasen
-          if (
-            bullet.x < 0 ||
-            bullet.x > this.canvas.width ||
-            bullet.y < 0 ||
-            bullet.y > this.canvas.height
-          ) {
-            bullets.bullet.splice(index, 1);
-          }
-        });
-      }
+        //Skapar en duplikat av tilemapen för att kunna rita över den
+        if (overlayIndex !== null) {
+          const overlayMapX = (overlayIndex % tilesPerRow) * this.cellSize;
+          const overlayMapY =
+            Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
 
-      checkDeath(player) {
-        if (player.playerHealth <= 0) {
-          alert("Game Over!, YOU DIED"); // Visa meddelande
-          return true; // Avsluta funktionen
+          this.ctx.drawImage(
+            this.tilemap, // Use the same tilemap for the overlay
+            overlayMapX,
+            overlayMapY,
+            this.cellSize,
+            this.cellSize,
+            x * this.cellSize * 3,
+            y * this.cellSize * 3,
+            this.cellSize * 3,
+            this.cellSize * 3
+          );
         }
-        return false
-      }
+      });
+    });
+  }
 
-      increaseLevel(zombie, zombie2) {
-        var previousLevel = this.level; //Spara nivån innan den ökar
-        this.level++; //Öka nivån med 1
-        if (previousLevel <= 1 && this.level >= 2) {
-          // this.tilemap.src = "Tilemap_2.png"; 
-          this.overlay.src = "Tilemap_2.png"; 
-          this.tiles = this.backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
-        }
-    
-        zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
-        zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
+  drawPlayer(player) {
+    this.ctx.fillStyle = "blue";
+    this.ctx.fillRect(
+      player.playerX, // Use exact pixel position
+      player.playerY, // Use exact pixel position
+      player.playerSizeX,
+      player.playerSizeY
+    );
+  }
+
+  drawBullets(bullets) {
+    this.ctx.fillStyle = "red";
+    bullets.bullet.forEach((bullet, index) => {
+      this.ctx.beginPath();
+      this.ctx.arc(bullet.x, bullet.y, bullets.bulletSize, 0, 2 * Math.PI);
+      this.ctx.fill();
+
+      // Flytta skottet
+      if (bullet.direction === "up") bullet.y -= bullet.speed;
+      if (bullet.direction === "down") bullet.y += bullet.speed;
+      if (bullet.direction === "left") bullet.x -= bullet.speed;
+      if (bullet.direction === "right") bullet.x += bullet.speed;
+
+      // Ta bort skott om det lämnar canvasen
+      if (
+        bullet.x < 0 ||
+        bullet.x > this.canvas.width ||
+        bullet.y < 0 ||
+        bullet.y > this.canvas.height
+      ) {
+        bullets.bullet.splice(index, 1);
       }
-    
-      //Kordinat på spelaren och vart man kan gå
-      isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
-        const tileMapX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
-        const tileMapX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-        const tileMapY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
-        const tileMapY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
-    
-        //Om spelaren är utanför kartan, return false
-        if (
-          tileMapX < 0 ||
-          tileMapY < 0 ||
-          tileMapY >= this.tiles.length ||
-          tileMapX >= this.tiles[0].length
-        ) {
-          return false;
-        }
-    
-        //om alla delar av gubben är på en tile som är walkable, return true
-        return (
-          walkable.includes(this.tiles[tileMapY][tileMapX].type) &&
-          walkable.includes(this.tiles[tileMapY1][tileMapX1].type) &&
-          walkable.includes(this.tiles[tileMapY][tileMapX1].type) &&
-          walkable.includes(this.tiles[tileMapY1][tileMapX].type)
-        );
-      }
+    });
+  }
+
+  checkDeath(player) {
+    if (player.playerHealth <= 0) {
+      alert("Game Over!, YOU DIED"); // Visa meddelande
+      return true; // Avsluta funktionen
+    }
+    return false;
+  }
+
+  increaseLevel(zombie, zombie2) {
+    var previousLevel = this.level; //Spara nivån innan den ökar
+    this.level++; //Öka nivån med 1
+    if (previousLevel <= 1 && this.level >= 2) {
+      // this.tilemap.src = "Tilemap_2.png";
+      this.overlay.src = "Tilemap_2.png";
+      this.tiles = this.backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
+    }
+
+    zombie.respawnCount = 0; // Återställ respawn-räknaren för zombien
+    zombie2.respawnCount = 0; // Återställ respawn-räknaren för zombien nummer 2
+  }
+
+  //Kordinat på spelaren och vart man kan gå
+  isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
+    const tileMapX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
+    const tileMapX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+    const tileMapY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
+    const tileMapY = Math.floor(y / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
+
+    //Om spelaren är utanför kartan, return false
+    if (
+      tileMapX < 0 ||
+      tileMapY < 0 ||
+      tileMapY >= this.tiles.length ||
+      tileMapX >= this.tiles[0].length
+    ) {
+      return false;
+    }
+
+    //om alla delar av gubben är på en tile som är walkable, return true
+    return (
+      walkable.includes(this.tiles[tileMapY][tileMapX].type) &&
+      walkable.includes(this.tiles[tileMapY1][tileMapX1].type) &&
+      walkable.includes(this.tiles[tileMapY][tileMapX1].type) &&
+      walkable.includes(this.tiles[tileMapY1][tileMapX].type)
+    );
+  }
 }
