@@ -18,6 +18,7 @@ import {
 import { controls, keys } from "./controls.js"; // Importera kontrollerna
 import { Player, Zombie, Bullets, Game, BackgroundLibrary } from "./classes.js";
 
+//tar klassen med "tilemapen" så den kan genereras
 const backgroundLibrary = new BackgroundLibrary(); // Skapar en instans av BackgroundLibrary
 
 const canvas = document.getElementById("gameCanvas");
@@ -29,8 +30,8 @@ const bulletHandeler = new Bullets();
 const game = new Game(backgroundLibrary, canvas, ctx);
 const zombie = new Zombie(game.cellSize, 0, 0, game, canvas, ctx);
 const zombie2 = new Zombie(game.cellSize, 10, 0, game, canvas, ctx);
-
 const boss = new Zombie(game.cellSize, 20, 0, game, canvas, ctx);
+
 // Bossens egenskaper
 boss.zombieSize = 64; // Större storlek än vanliga zombies
 boss.zombieSpeed = 0.5; // Långsammare rörelse
@@ -97,7 +98,6 @@ function checkBossCollision(player, boss) {
     playerTop < bossBottom
   );
 }
-
 function checkZombieCollision(zombie1, zombie2) {
   // Samma som övre fast för zombie 1 och 2
   const zombie1Left = zombie1.zombieX * zombie1.cellSize;
@@ -156,9 +156,9 @@ function gameLoop() {
 
   // Om knappen är nedtryckt och inom gränserna
   if (keys.w && player.playerY > 0) {
-    player.movePlayer("up", game);
+    player.movePlayer("up", game);// Flytta spelaren uppåt, behöver game klassen från annan fil
   }
-  if (keys.s && player.playerY < canvas.height - player.playerSizeY) {
+  if (keys.s && player.playerY < canvas.height - player.playerSizeY) { // Flytta spelaren nedåt, kollar om den är innanför gränerna
     player.movePlayer("down", game);
   }
   if (keys.a && player.playerX > 0) {
@@ -173,14 +173,15 @@ function gameLoop() {
     bulletHandeler.shootCooldown === 0 &&
     (keys.ArrowRight || keys.ArrowLeft || keys.ArrowUp || keys.ArrowDown)
   ) {
+    //Lägger till ett skott i bullet arrayen
     bulletHandeler.bullet.push({
-      x:
+      x: //x kordinat för skottet
         player.playerX + player.playerSizeX / 2 - bulletHandeler.bulletSize / 2,
-      y: player.playerY,
-      direction: bulletHandeler.direction,
-      speed: 5,
+      y: player.playerY, //y kordinat för skottet
+      direction: bulletHandeler.direction, // riktning för skottet
+      speed: 5, //hastighet för skottet
     });
-    bulletHandeler.shootCooldown = bulletHandeler.shootCooldownMax;
+    bulletHandeler.shootCooldown = bulletHandeler.shootCooldownMax; // Sätter cooldown till max igen
   }
 
   // Kontrollera kollision mellan zombier
@@ -199,23 +200,35 @@ function gameLoop() {
     boss.attackCooldown--;
   }
 
+  //kollar om zomierna kolliderar med varandra
   if (checkZombieCollision(zombie, zombie2)) {
     console.log("Zombies collided!");
 
+    //Om zombierna kolliderar, flytta dem bort från varandra
+    //Göra pixlar till tile kordinater
     zombie.zombieX -= zombie.zombieSpeed / zombie.cellSize;
     zombie.zombieY -= zombie.zombieSpeed / zombie.cellSize;
 
     zombie2.zombieX += zombie2.zombieSpeed / zombie2.cellSize;
     zombie2.zombieY += zombie2.zombieSpeed / zombie2.cellSize;
   }
+
+  //Initierar bossen
   if (game.level === 2) {
+    //Bossen följer spelaren
     boss.trackBossPlayer(player, game, checkBossCollision);
+
+    //Kollar om bossen blir skjuten
     boss.checkBulletCollision(bulletHandeler, game);
   } else {
+    // Zombies följer spelaren
     zombie2.trackPlayer(player, game, checkCollision);
+    // Kollar om zombien blir skjuten
     zombie2.checkBulletCollision(bulletHandeler, game);
 
+    // Zombies följer spelaren
     zombie.trackPlayer(player, game, checkCollision);
+    // Kollar om zombien blir skjuten
     zombie.checkBulletCollision(bulletHandeler, game);
   }
 

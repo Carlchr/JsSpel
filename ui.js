@@ -1,3 +1,4 @@
+//impoterar allt med respektive klasserna 
 const healthCounter = document.querySelector(".hp");
 const levelCounter = document.querySelector(".level");
 const coinCounter = document.querySelector(".coin");
@@ -6,6 +7,7 @@ const zombieDmgCounter = document.querySelector(".zombieDmg");
 const coinsPerZombieCounter = document.querySelector(".coinsPerZombie");
 
 export function updateHealthCounter(player) {
+  //ändrar texten i html elementet med klassen "hp"
     healthCounter.textContent = `Player Health: ${player.playerHealth}`;
   }
   export function updateLevelCounter(game) {
