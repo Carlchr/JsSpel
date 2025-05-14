@@ -62,6 +62,9 @@ export class Zombie {
     this.respawnCount = 0;
     this.canvas = canvas;
     this.ctx = ctx;
+
+    this.projectiles = [];
+    this.shootTimer = 0;
   }
 
   respawnZombie(game) {
@@ -86,6 +89,108 @@ export class Zombie {
     );
   }
 
+  shootAtPlayer(player) {
+    // Skapa ett skott som går mot spelarens position
+    this.projectiles.push({
+      x: this.zombieX * this.cellSize + this.zombieSize / 2,
+      y: this.zombieY * this.cellSize + this.zombieSize / 2,
+      targetX: player.playerX + player.playerSizeX / 2,
+      targetY: player.playerY + player.playerSizeY / 2,
+      speed: 2,
+    });
+  }
+
+  updateProjectilesWithPlayer(player) {
+    console.log("Updating boss projectiles...");
+    for (let index = this.projectiles.length - 1; index >= 0; index--) {
+      const projectile = this.projectiles[index];
+      const dx = projectile.targetX - projectile.x;
+      const dy = projectile.targetY - projectile.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Flytta skottet
+      projectile.x += (dx / distance) * projectile.speed;
+      projectile.y += (dy / distance) * projectile.speed;
+
+      // Kontrollera kollision med spelaren
+      const playerLeft = player.playerX;
+      const playerRight = player.playerX + player.playerSizeX;
+      const playerTop = player.playerY;
+      const playerBottom = player.playerY + player.playerSizeY;
+
+      if (
+        projectile.x > playerLeft &&
+        projectile.x < playerRight &&
+        projectile.y > playerTop &&
+        projectile.y < playerBottom
+      ) {
+        player.playerHealth -= 10; // Spelaren tar 10 skada
+        this.projectiles.splice(index, 1); // Ta bort projektilen
+        console.log("Boss projectile hit the player!");
+        continue;
+      }
+
+      // Ta bort skott om det lämnar canvasen
+      if (
+        projectile.x < 0 ||
+        projectile.x > this.canvas.width ||
+        projectile.y < 0 ||
+        projectile.y > this.canvas.height
+      ) {
+        console.log("Projectile left canvas at:", projectile.x, projectile.y);
+        this.projectiles.splice(index, 1);
+      }
+    }
+  }
+
+  updateProjectiles() {
+    for (let index = this.projectiles.length - 1; index >= 0; index--) {
+      const projectile = this.projectiles[index];
+      const dx = projectile.targetX - projectile.x;
+      const dy = projectile.targetY - projectile.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Flytta skottet
+      projectile.x += (dx / distance) * projectile.speed;
+      projectile.y += (dy / distance) * projectile.speed;
+
+      // Ta bort skott om det når målet
+      if (distance < 0.5) {
+        this.projectiles.splice(index, 1);
+        continue;
+      }
+
+      // Ta bort skott om det lämnar canvasen
+      if (
+        projectile.x < 0 ||
+        projectile.x > this.canvas.width ||
+        projectile.y < 0 ||
+        projectile.y > this.canvas.height
+      ) {
+        console.log("Projectile left canvas at:", projectile.x, projectile.y);
+        this.projectiles.splice(index, 1);
+      }
+    }
+  }
+
+  drawProjectiles(ctx) {
+    ctx.fillStyle = "red";
+    this.projectiles.forEach((projectile) => {
+      ctx.beginPath();
+      ctx.arc(projectile.x, projectile.y, 5, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+  }
+
+  handleShooting(player) {
+    // Hantera skjutlogik var femte sekund
+    if (this.shootTimer <= 0) {
+      this.shootAtPlayer(player);
+      this.shootTimer = 30; // 5 sekunder (60 FPS * 5)
+    } else {
+      this.shootTimer--;
+    }
+  }
   //Går baklänges eftersom man tar bort skotten framifrån
   //Annars kan man missa om man går igenom arrayen framifrån
   checkBulletCollision(bullets, game) {
@@ -682,12 +787,14 @@ export class Game {
     return false;
   }
 
-  increaseLevel(zombie, zombie2) {
+  increaseLevel(zombie, zombie2, player) {
     var previousLevel = this.level; //Spara nivån innan den ökar
     this.level++; //Öka nivån med 1
     if (previousLevel <= 1 && this.level >= 2) {
       // this.tilemap.src = "Tilemap_2.png";
       this.overlay.src = "Tilemap_2.png";
+      player.playerX = this.canvas.width / 2;
+      player.playerY = this.canvas.height / 2;
       this.tiles = this.backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
     }
 

@@ -31,10 +31,11 @@ const zombie = new Zombie(game.cellSize, 0, 0, game, canvas, ctx);
 const zombie2 = new Zombie(game.cellSize, 10, 0, game, canvas, ctx);
 
 const boss = new Zombie(game.cellSize, 20, 0, game, canvas, ctx);
+boss.isActive = false; // Bossen är inaktiv från början för att kunna fixa if satsen i slutet av gameloop
 // Bossens egenskaper
 boss.zombieSize = 64; // Större storlek än vanliga zombies
-boss.zombieSpeed = 0.5; // Långsammare rörelse
-boss.zombieHealth = 100 + 10 * game.level; // Mer hälsa
+boss.zombieSpeed = 1; // Långsammare rörelse
+boss.zombieHealth = 100 + 20 * game.level; // Mer hälsa
 boss.zombieDamage = 20; // Mer skada
 
 // Antal döda zombies
@@ -76,6 +77,7 @@ function checkCollision(player, zombie) {
     playerTop < zombieBottom
   );
 }
+
 function checkBossCollision(player, boss) {
   // Spelarens rektangel
   const playerLeft = player.playerX;
@@ -151,7 +153,7 @@ function gameLoop() {
   // Håller koll på hur många zombies som dött
   globalZombieRespawnCount = zombie.respawnCount + zombie2.respawnCount;
   if (globalZombieRespawnCount % 10 === 0 && globalZombieRespawnCount > 0) {
-    game.increaseLevel(zombie, zombie2); // Öka nivån
+    game.increaseLevel(zombie, zombie2, player); // Öka nivån
   }
 
   // Om knappen är nedtryckt och inom gränserna
@@ -211,6 +213,9 @@ function gameLoop() {
   if (game.level === 2) {
     boss.trackBossPlayer(player, game, checkBossCollision);
     boss.checkBulletCollision(bulletHandeler, game);
+
+    boss.handleShooting(player);
+    boss.updateProjectilesWithPlayer(player);
   } else {
     zombie2.trackPlayer(player, game, checkCollision);
     zombie2.checkBulletCollision(bulletHandeler, game);
@@ -224,9 +229,16 @@ function gameLoop() {
   game.drawBullets(bulletHandeler); // Ritar skotten
   if (game.level === 2) {
     boss.drawZombie(ctx); // Ritar bossen
+    boss.drawProjectiles(ctx); // Ritar bossens projektiler
+    boss.isActive = true; // Sätter bossen till aktiv
+
+    if (boss.isActive) {
+      console.log("Player position set to (5, 10) because boss is active.");
+    }
   } else {
     zombie.drawZombie(ctx); // Ritar zombien
     zombie2.drawZombie(ctx); // Ritar zombien nummer 2
+    boss.isActive = false; // Sätter bossen till inaktiv
   }
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen
