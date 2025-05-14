@@ -118,7 +118,6 @@ function checkZombieCollision(zombie1, zombie2) {
     zombie1Top < zombie2Bottom
   );
 }
-
 function gameLoop() {
   if (continueGame == false) return;
 
@@ -144,6 +143,13 @@ function gameLoop() {
   if (game.checkDeath(player)) {
     continueGame = false;
     return;
+  }
+
+  //compete game
+  if (game.level > 15) {
+    alert("YOU WON THE GAME!");
+    const victoryGif = document.getElementById("victoryGif");
+    victoryGif.style.display = "block";
   }
 
   // Kontrollerna på spelaren
@@ -217,7 +223,7 @@ function gameLoop() {
   }
 
   //Initierar bossen
-  if (game.level === 2) {
+  if (game.level === 7 || game.level === 15) {
     //Bossen följer spelaren
     boss.trackBossPlayer(player, game, checkBossCollision);
 
@@ -241,18 +247,12 @@ function gameLoop() {
   game.drawGame(); // Ritar bakgrunden och clearar canvasen
   game.drawPlayer(player); // Ritar spelaren
   game.drawBullets(bulletHandeler); // Ritar skotten
-  if (game.level === 2) {
+  if (game.level === 7 || game.level === 15) {
     boss.drawZombie(ctx); // Ritar bossen
     boss.drawProjectiles(ctx); // Ritar bossens projektiler
-    boss.isActive = true; // Sätter bossen till aktiv
-
-    if (boss.isActive) {
-      console.log("Player position set to (5, 10) because boss is active.");
-    }
   } else {
     zombie.drawZombie(ctx); // Ritar zombien
     zombie2.drawZombie(ctx); // Ritar zombien nummer 2
-    boss.isActive = false; // Sätter bossen till inaktiv
   }
 
   requestAnimationFrame(gameLoop); // Fortsätt loopen

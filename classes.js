@@ -6,6 +6,8 @@ export class Player {
     this.playerHealth = 100; //Player health§
     this.playerX = canvas.width / 2 - this.playerSizeX / 2; //X position
     this.playerY = canvas.height / 2 - this.playerSizeY / 2; //Y position
+    this.image = new Image(); //Image
+    this.image.src = "assets/bröd.png"; //Image source
   }
 
   movePlayer(direction, game) {
@@ -215,11 +217,9 @@ export class Zombie {
         this.zombieHealth -= bullets.bulletDamage;
         bullets.bullet.splice(i, 1);
 
-        if (game.level === 2) {
-        } else {
-          if (this.zombieHealth <= 0) {
-            this.respawnZombie(game);
-          }
+        if (game.level === 7 || game.level === 15) {
+        } else if (this.zombieHealth <= 0) {
+          this.respawnZombie(game);
         }
       }
     }
@@ -749,10 +749,10 @@ export class Game {
   }
 
   drawPlayer(player) {
-    this.ctx.fillStyle = "blue";
-    this.ctx.fillRect(
-      player.playerX, // Use exact pixel position
-      player.playerY, // Use exact pixel position
+    this.ctx.drawImage(
+      player.image,
+      player.playerX,
+      player.playerY,
       player.playerSizeX,
       player.playerSizeY
     );
@@ -796,7 +796,7 @@ export class Game {
   increaseLevel(zombie, zombie2, player) {
     var previousLevel = this.level; //Spara nivån innan den ökar
     this.level++; //Öka nivån med 1
-    if (previousLevel <= 1 && this.level >= 2) {
+    if (previousLevel <= 7 && this.level >= 8) {
       player.playerX = this.canvas.width / 2;
       player.playerY = this.canvas.height / 2;
       this.tiles = this.backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
