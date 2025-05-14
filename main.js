@@ -99,6 +99,8 @@ function checkBossCollision(player, boss) {
     playerTop < bossBottom
   );
 }
+game.level = 16;
+
 function checkZombieCollision(zombie1, zombie2) {
   // Samma som övre fast för zombie 1 och 2
   const zombie1Left = zombie1.zombieX * zombie1.cellSize;
@@ -147,9 +149,16 @@ function gameLoop() {
 
   //compete game
   if (game.level > 15) {
-    alert("YOU WON THE GAME!");
+    alert("YOU WON THE GAME! \n\n" + "PRESS SPACE TO GET REWARD");
     const victoryGif = document.getElementById("victoryGif");
     victoryGif.style.display = "block";
+
+    // Spela upp ljud
+    const victorySound = document.getElementById("victorySound");
+    victorySound.play();
+
+    continueGame = false; // Stoppa spelet
+    return;
   }
 
   // Kontrollerna på spelaren
