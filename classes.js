@@ -696,34 +696,38 @@ export class Game {
   }
 
   drawGame() {
-    const tilesPerRow = 13; // Tiles per row in the tilemap
-    const tilesPerColumn = 13; // Tiles per column in the tilemap
+    const tilesPerRow = 13; //Tiles för varje rad i tilemapen
+    const tilesPerColumn = 13; //Tiles för varje kolumn i tilemapen
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
+        //Sätter index som variabeln index
         const { tileIndex, overlayIndex } = tile;
 
-        //Pick tile from tilemap according to tileIndex
+        //Tar en tile från tilemapen beroende på tileIndex
         const tileMapX = (tileIndex % tilesPerRow) * this.cellSize;
         const tileMapY = Math.floor(tileIndex / tilesPerColumn) * this.cellSize;
 
-        // Draw the base tile
+        //Ritar tilemapen
+        //drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+        //s = på tilemapen, d = på canvasen
         this.ctx.drawImage(
           this.tilemap,
-          tileMapX,
-          tileMapY,
+          tileMapX, //vilken tile i tilemapen på x led
+          tileMapY, //vilken tile i tilemapen på y led
+          this.cellSize, //storlek på uttagen på tilemapen
           this.cellSize,
-          this.cellSize,
-          x * this.cellSize * 3,
-          y * this.cellSize * 3,
-          this.cellSize * 3,
-          this.cellSize * 3
+          x * this.cellSize * 3, //x kordinat för rita rutan
+          y * this.cellSize * 3, //y kordinat för rita rutan
+          this.cellSize * 3, // bredd bilden
+          this.cellSize * 3 //höjd bilden
         );
 
         //Skapar en duplikat av tilemapen för att kunna rita över den
         if (overlayIndex !== null) {
+          //Tar en tile från tilemapen beroende på tileIndex
           const overlayMapX = (overlayIndex % tilesPerRow) * this.cellSize;
           const overlayMapY =
             Math.floor(overlayIndex / tilesPerColumn) * this.cellSize;
@@ -757,6 +761,7 @@ export class Game {
   drawBullets(bullets) {
     this.ctx.fillStyle = "red";
     bullets.bullet.forEach((bullet, index) => {
+      // Rita skottet till en cirkel
       this.ctx.beginPath();
       this.ctx.arc(bullet.x, bullet.y, bullets.bulletSize, 0, 2 * Math.PI);
       this.ctx.fill();
@@ -774,6 +779,7 @@ export class Game {
         bullet.y < 0 ||
         bullet.y > this.canvas.height
       ) {
+        //tar bort skottet
         bullets.bullet.splice(index, 1);
       }
     });
@@ -791,8 +797,6 @@ export class Game {
     var previousLevel = this.level; //Spara nivån innan den ökar
     this.level++; //Öka nivån med 1
     if (previousLevel <= 1 && this.level >= 2) {
-      // this.tilemap.src = "Tilemap_2.png";
-      this.overlay.src = "Tilemap_2.png";
       player.playerX = this.canvas.width / 2;
       player.playerY = this.canvas.height / 2;
       this.tiles = this.backgroundLibrary.background2; //Kebab är en array med bakgrundsbilder
@@ -804,6 +808,7 @@ export class Game {
 
   //Kordinat på spelaren och vart man kan gå
   isTileWalkable(x, y, width, height, walkable = ["walkable"]) {
+    //tar x kordinat och player width delat med storelsen på cellerna för att få tilemap kordinater
     const tileMapX1 = Math.floor((x + width) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(bredd inkluderad)
     const tileMapX = Math.floor(x / (this.cellSize * 3)); //Kollar vilken tile spelaren är på, tar x positionen och delar med cellstorleken
     const tileMapY1 = Math.floor((y + height) / (this.cellSize * 3)); //Kollar vilken tile spelaren är på(höjd inkluderad)
@@ -819,7 +824,7 @@ export class Game {
       return false;
     }
 
-    //om alla delar av gubben är på en tile som är walkable, return true
+    //Om alla delar av gubben är på en tile som är walkable, return true
     return (
       walkable.includes(this.tiles[tileMapY][tileMapX].type) &&
       walkable.includes(this.tiles[tileMapY1][tileMapX1].type) &&
